@@ -1,7 +1,7 @@
 export const Header = () => {
   return (
     <>
-      <div className="flex justify-center mb-8 py-4 top-0 ">
+      <div className="flex justify-center mb-4 py-4 top-0 ">
         <div className="text-5xl">mastermind</div>
         {/* <div className="flex flex-wrap justify-center space-x-4">
           <HeaderCategory name={"coding"} href={"/Coding"} />

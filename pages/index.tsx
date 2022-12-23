@@ -1,12 +1,26 @@
 import Head from "next/head";
+import { useEffect, useState } from "react";
 
-import { Inter } from "@next/font/google";
-import { Game } from "../components/Game";
+import { GameBoard } from "../components/Game";
 import { Header } from "../components/Header";
-
-const inter = Inter({ subsets: ["latin"] });
+import { Options } from "../components/Options";
 
 export default function Home() {
+  const [numbers, setNumbers] = useState<number[]>();
+
+  useEffect(() => {
+    async function fetchData() {
+      const response = await fetch(
+        "https://www.random.org/integers/?num=4&min=1&max=6&col=1&base=10&format=plain&rnd=new"
+      );
+      const text = await response.text();
+      const integers = text.split("\n").map((intString) => parseInt(intString));
+      integers.pop();
+      setNumbers(integers);
+    }
+    fetchData();
+  }, []);
+
   return (
     <>
       <Head>
@@ -16,7 +30,13 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Header />
-      <Game />
+      <div className="mx-auto w-[500px] bg-green-500 space-y-4">
+        <div className="flex justify-center">
+          {numbers ? numbers : "Loading..."}
+        </div>
+        <GameBoard />
+        <Options />
+      </div>
     </>
   );
 }
