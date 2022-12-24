@@ -7,7 +7,7 @@ interface OptionsProps {
 
 export const Options = ({ options }: OptionsProps) => {
   return (
-    <div className="mx-auto w-[400px] bg-yellow-400">
+    <div className="mx-auto w-[400px]">
       <Row options={options} />
     </div>
   );
@@ -40,7 +40,7 @@ export const Slot = ({ value, onClick }: SlotProps) => {
   return (
     <div
       onClick={onClick}
-      className="w-10  h-10 rounded-full flex justify-center items-center bg-white border hover:bg-black/50 border-black"
+      className="w-10  h-10 rounded-full flex justify-center items-center bg-white border-2 hover:bg-black/50 border-black"
     >
       {value}
     </div>

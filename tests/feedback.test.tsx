@@ -113,6 +113,18 @@ describe("feedback 4", () => {
   });
 });
 
+describe("feedback 4", () => {
+  test("incorrect while testing", () => {
+    const feedback = new FeedbackModel([5, 7, 7, 5], [6, 6, 5, 7]);
+    const result = feedback.getFeedback();
+    expect(result).toHaveLength(4);
+    expect(result[0]).toBe(1);
+    expect(result[1]).toBe(1);
+    expect(result[2]).toBe(0);
+    expect(result[3]).toBe(0);
+  });
+});
+
 describe("sum module", () => {
   test("adds 1 + 2 to equal 3", () => {
     expect(sum(1, 2)).toBe(3);

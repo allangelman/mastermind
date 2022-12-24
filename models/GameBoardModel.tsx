@@ -1,65 +1,66 @@
-import { Options } from "next/dist/server/base-server";
 import { FeedbackModel } from "./FeedbackModel";
 import { OptionsModel } from "./OptionsModel";
 
 export class GameBoardModel {
-  numPegs: number;
-  numRows: number;
+  readonly numSlots: number;
   currentRound: number;
   gameBoard: number[][];
-  feedback: FeedbackModel[] = [];
-  code: number[];
+  private runningFeedback: FeedbackModel[] = [];
+  private readonly code: number[];
   options: OptionsModel;
 
   constructor(
-    numPegs: number,
+    numSlots: number,
     numRows: number,
     options: OptionsModel,
     code: number[]
   ) {
+    this.numSlots = numSlots;
     this.code = code;
     this.options = options;
-    this.numPegs = numPegs;
-    this.numRows = numRows;
     this.currentRound = 0;
     this.gameBoard = [];
     for (let i = 0; i < numRows; i++) {
       const row = [];
-      for (let i = 0; i < numPegs; i++) {
+      for (let i = 0; i < numSlots; i++) {
         row.push(-1);
       }
       this.gameBoard.push(row);
     }
   }
 
-  setPeg(row: number, col: number, value: number): void {
+  setSlot(row: number, col: number, value: number): void {
     this.gameBoard[row][col] = value;
   }
 
+  getSlotValue(row: number, col: number): number {
+    return this.gameBoard[row][col];
+  }
+
   setFeedback(guesses: number[]): void {
-    this.feedback.push(new FeedbackModel(guesses, this.code));
+    this.runningFeedback.push(new FeedbackModel(guesses, this.code));
   }
 
   getFeedback(row: number): FeedbackModel {
-    if (this.feedback.length > 0) {
-      return this.feedback[row];
+    if (this.runningFeedback.length > 0) {
+      return this.runningFeedback[row];
     }
     return new FeedbackModel([-1, -1, -1, -1], this.code);
-  }
-
-  getPeg(row: number, col: number): number {
-    return this.gameBoard[row][col];
   }
 
   incrementRound(): void {
     this.currentRound += 1;
   }
 
-  getRound(): number {
-    return this.currentRound;
+  getOptions(): OptionsModel {
+    return this.options;
   }
 
   getGameBoard(): number[][] {
     return this.gameBoard;
+  }
+
+  getGameBoardRow(rowNumber: number): number[] {
+    return this.gameBoard[rowNumber];
   }
 }

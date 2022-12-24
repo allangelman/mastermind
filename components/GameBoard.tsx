@@ -1,32 +1,52 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { FeedbackModel } from "../models/FeedbackModel";
 import { GameBoardModel } from "../models/GameBoardModel";
+import cn from "classnames";
 
 interface GameProps {
   board: GameBoardModel;
+  loading?: boolean;
 }
 
-export const GameBoard = ({ board }: GameProps) => {
+export const GameBoard = ({ board, loading }: GameProps) => {
   const [currentRound, setCurrentRound] = useState<number>(0);
+
   return (
-    <div className="mx-auto w-[300px] bg-yellow-400 space-y-2">
-      {board.getGameBoard().map((row, i) => (
-        <Row
-          key={i}
-          rowNumber={i}
-          numberPegs={row.length}
-          board={board}
-          round={currentRound}
-          setCurrentRound={setCurrentRound}
-        />
-      ))}
-    </div>
+    <>
+      {loading ? (
+        <div className="mx-auto w-[300px] space-y-2">
+          {board.getGameBoard().map((row, i) => (
+            <Row
+              key={i}
+              rowNumber={i}
+              numSlots={board.numSlots}
+              board={board}
+              round={currentRound}
+              setCurrentRound={setCurrentRound}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="mx-auto w-[300px] space-y-2">
+          {board.getGameBoard().map((row, i) => (
+            <Row
+              key={i}
+              rowNumber={i}
+              numSlots={board.numSlots}
+              board={board}
+              round={currentRound}
+              setCurrentRound={setCurrentRound}
+            />
+          ))}
+        </div>
+      )}
+    </>
   );
 };
 
 interface RowProps {
   rowNumber: number;
-  numberPegs: number;
+  numSlots: number;
   round: number;
   board: GameBoardModel;
   setCurrentRound: Dispatch<SetStateAction<number>>;
@@ -34,22 +54,26 @@ interface RowProps {
 
 export const Row = ({
   board,
-  numberPegs,
+  numSlots,
   rowNumber,
   round,
   setCurrentRound,
 }: RowProps) => {
   const [feedback, setFeedback] = useState<FeedbackModel>();
+
   return (
     <div className="flex flex-row space-x-3 justify-center items-center">
       <div className="flex flex-row space-x-2 justify-center items-center">
-        {Array.from(Array(numberPegs)).map((peg, i) => (
+        {Array.from(Array(numSlots)).map((peg, i) => (
           <Slot
             key={i}
             onClick={() => {
-              board.setPeg(rowNumber, i, board.options.getCurrentOption());
+              board.setSlot(
+                rowNumber,
+                i,
+                board.getOptions().getCurrentOption()
+              );
             }}
-            value={board.getPeg(rowNumber, i)}
             board={board}
             rowNumber={rowNumber}
             colNumber={i}
@@ -61,8 +85,8 @@ export const Row = ({
         round={round}
         onClick={() => {
           board.incrementRound();
-          setCurrentRound(board.getRound());
-          board.setFeedback(board.getGameBoard()[rowNumber]);
+          setCurrentRound(board.currentRound);
+          board.setFeedback(board.getGameBoardRow(rowNumber));
           setFeedback(board.getFeedback(rowNumber));
         }}
         board={board}
@@ -75,7 +99,6 @@ export const Row = ({
 
 interface SlotProps {
   onClick: () => void;
-  value: number;
   board: GameBoardModel;
   rowNumber: number;
   colNumber: number;
@@ -84,7 +107,6 @@ interface SlotProps {
 
 export const Slot = ({
   onClick,
-  value,
   round,
   board,
   rowNumber,
@@ -98,10 +120,12 @@ export const Slot = ({
         <div
           onClick={() => {
             onClick();
-            setSlotValue(board.getPeg(rowNumber, colNumber));
+            setSlotValue(board.getSlotValue(rowNumber, colNumber));
           }}
-          className="w-10 h-10 flex rounded-full bg-white border-2 hover:bg-black/50 border-black"
+          className="w-10 h-10 flex rounded-full bg-white border-2 hover:bg-slate-300 border-black"
         ></div>
+      ) : slotValue === -1 ? (
+        <div className="w-10 h-10 flex justify-center items-center rounded-full bg-slate-500 border-2 border-black"></div>
       ) : (
         <div className="w-10 h-10 flex justify-center items-center rounded-full bg-white border-2 border-black">
           {slotValue}
@@ -121,7 +145,6 @@ interface FeedbackProps {
 
 export const Feedback = ({
   round,
-  board,
   onClick,
   rowNumber,
   feedback,
@@ -133,6 +156,8 @@ export const Feedback = ({
       setHints(feedback.getFeedback());
     }
   }, [feedback]);
+
+  console.log(hints);
 
   return (
     <>
@@ -148,7 +173,7 @@ export const Feedback = ({
       </div>
       {rowNumber === round ? (
         <button
-          className="w-20 h-10 bg-red-500"
+          className="w-20 h-10 bg-red-500 rounded-lg"
           onClick={() => {
             onClick();
           }}
@@ -156,7 +181,7 @@ export const Feedback = ({
           Check
         </button>
       ) : (
-        <div className="w-20 h-10 bg-blue-500"></div>
+        <div className="w-20 h-10"></div>
       )}
     </>
   );
@@ -169,9 +194,13 @@ interface FeedbackCircleProps {
 export const FeedbackCircle = ({ number }: FeedbackCircleProps) => {
   return (
     <>
-      {number === 0 && <div className="w-2 h-2 rounded-full bg-white" />}
-      {number === 1 && <div className="w-2 h-2 rounded-full bg-red-500" />}
-      {number === 2 && <div className="w-2 h-2 rounded-full bg-black" />}
+      <div
+        className={cn("w-2 h-2 rounded-full", {
+          "bg-slate-300": number === 0,
+          "bg-red-500": number === 1,
+          "bg-black": number === 2,
+        })}
+      />
     </>
   );
 };

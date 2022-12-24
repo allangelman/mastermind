@@ -5,43 +5,44 @@ export class FeedbackModel {
   feedback: number[];
   code: number[];
 
-  constructor(guesses: number[], code: number[]) {
+  constructor(guess: number[], code: number[]) {
     this.code = code;
-    this.feedback = this.feedbackFromGuesses(guesses);
+    this.feedback = this.feedbackFromGuess(guess);
   }
 
-  private feedbackFromGuesses(guesses: number[]): number[] {
+  private feedbackFromGuess(guess: number[]): number[] {
     const feedback = [0, 0, 0, 0];
     let numCorrectNumbers = 0;
     let numCorrectLocations = 0;
     let numRed = 0;
     let numBlack = 0;
+    const codeMap: Map<number, number> = new Map([]);
 
-    const codeDictionary: Map<number, number> = new Map([]);
-
+    //intializing codeMap
     for (let i = 0; i < 4; i++) {
-      const value = codeDictionary.get(this.code[i]);
+      const value = codeMap.get(this.code[i]);
       if (value) {
-        codeDictionary.set(this.code[i], value + 1);
+        codeMap.set(this.code[i], value + 1);
       } else {
-        codeDictionary.set(this.code[i], 1);
+        codeMap.set(this.code[i], 1);
       }
     }
 
+    //calculating numCorrectLocations and numCorrectNumbers
     for (let i = 0; i < 4; i++) {
-      const value = codeDictionary.get(guesses[i]);
-      if (guesses[i] === this.code[i]) {
+      const value = codeMap.get(guess[i]);
+      if (guess[i] === this.code[i]) {
         numCorrectLocations += 1;
       }
-      if (this.code.includes(guesses[i]) && value && value > 0) {
+      if (this.code.includes(guess[i]) && value && value > 0) {
         numCorrectNumbers += 1;
-        codeDictionary.set(guesses[i], value - 1);
+        codeMap.set(guess[i], value - 1);
       }
     }
 
+    //converting numCorrectLocations and numCorrectNumbers to "black" and "red" responses
     numBlack = numCorrectLocations;
     numRed = numCorrectNumbers - numCorrectLocations;
-
     for (let i = 0; i < numBlack; i++) {
       feedback[i] = 2;
     }

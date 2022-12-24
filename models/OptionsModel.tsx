@@ -1,10 +1,8 @@
 export class OptionsModel {
-  numOptions: number;
-  currentOption: number = -1;
-  options: number[];
+  private currentOption: number = -1;
+  private options: number[];
 
   constructor(numOptions: number) {
-    this.numOptions = numOptions;
     this.options = [];
     for (let i = 0; i < numOptions; i++) {
       this.options.push(i);
@@ -21,10 +19,6 @@ export class OptionsModel {
 
   setCurrentOption(number: number): number {
     return (this.currentOption = number);
-  }
-
-  getNumOptions(): number {
-    return this.numOptions;
   }
 
   getOptions(): number[] {

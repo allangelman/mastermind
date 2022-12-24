@@ -1,7 +1,7 @@
 import Head from "next/head";
 import { useEffect, useState } from "react";
 
-import { GameBoard } from "../components/Game";
+import { GameBoard } from "../components/GameBoard";
 import { Header } from "../components/Header";
 import { Options } from "../components/Options";
 import { GameBoardModel } from "../models/GameBoardModel";
@@ -9,7 +9,6 @@ import { OptionsModel } from "../models/OptionsModel";
 
 export default function Home() {
   const [numbers, setNumbers] = useState<number[]>();
-  const [board, setBoard] = useState<GameBoardModel>();
 
   useEffect(() => {
     async function fetchData() {
@@ -25,7 +24,6 @@ export default function Home() {
   }, []);
 
   const options = new OptionsModel(8);
-  // const game = new GameBoardModel(4, 10, options, numbers);
 
   return (
     <>
@@ -36,7 +34,7 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Header />
-      <div className="mx-auto w-[500px] bg-green-500 space-y-4">
+      <div className="mx-auto w-[500px] space-y-4">
         <div className="flex justify-center">
           {numbers ? numbers : "Loading..."}
         </div>
