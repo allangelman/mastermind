@@ -53,7 +53,7 @@ export class FeedbackModel {
     return feedback;
   }
 
-  getFeedback() {
+  getFeedback(): number[] {
     return this.feedback;
   }
 }

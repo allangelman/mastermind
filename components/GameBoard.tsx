@@ -1,7 +1,7 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { FeedbackModel } from "../models/FeedbackModel";
 import { GameBoardModel } from "../models/GameBoardModel";
 import cn from "classnames";
+import { GameBoardRowModel } from "../models/GameBoardRowModel";
 
 interface GameProps {
   board: GameBoardModel;
@@ -15,26 +15,26 @@ export const GameBoard = ({ board, loading }: GameProps) => {
     <>
       {loading ? (
         <div className="mx-auto w-[300px] space-y-2">
-          {board.getGameBoard().map((row, i) => (
+          {board.gameBoard.map((rowModel, i) => (
             <Row
               key={i}
-              rowNumber={i}
+              rowModel={rowModel}
               numSlots={board.numSlots}
               board={board}
-              round={currentRound}
+              currentRound={currentRound}
               setCurrentRound={setCurrentRound}
             />
           ))}
         </div>
       ) : (
         <div className="mx-auto w-[300px] space-y-2">
-          {board.getGameBoard().map((row, i) => (
+          {board.gameBoard.map((rowModel, i) => (
             <Row
               key={i}
-              rowNumber={i}
+              rowModel={rowModel}
               numSlots={board.numSlots}
               board={board}
-              round={currentRound}
+              currentRound={currentRound}
               setCurrentRound={setCurrentRound}
             />
           ))}
@@ -45,9 +45,9 @@ export const GameBoard = ({ board, loading }: GameProps) => {
 };
 
 interface RowProps {
-  rowNumber: number;
   numSlots: number;
-  round: number;
+  currentRound: number;
+  rowModel: GameBoardRowModel;
   board: GameBoardModel;
   setCurrentRound: Dispatch<SetStateAction<number>>;
 }
@@ -55,11 +55,11 @@ interface RowProps {
 export const Row = ({
   board,
   numSlots,
-  rowNumber,
-  round,
+  currentRound,
+  rowModel,
   setCurrentRound,
 }: RowProps) => {
-  const [feedback, setFeedback] = useState<FeedbackModel>();
+  const [feedback, setFeedback] = useState<number[]>();
 
   return (
     <div className="flex flex-row space-x-3 justify-center items-center">
@@ -68,29 +68,23 @@ export const Row = ({
           <Slot
             key={i}
             onClick={() => {
-              board.setSlot(
-                rowNumber,
-                i,
-                board.getOptions().getCurrentOption()
-              );
+              rowModel.setSlot(i, board.getCurrentOption());
             }}
-            board={board}
-            rowNumber={rowNumber}
+            rowModel={rowModel}
             colNumber={i}
-            round={round}
+            currentRound={currentRound}
           />
         ))}
       </div>
       <Feedback
-        round={round}
+        currentRound={currentRound}
         onClick={() => {
           board.incrementRound();
           setCurrentRound(board.currentRound);
-          board.setFeedback(board.getGameBoardRow(rowNumber));
-          setFeedback(board.getFeedback(rowNumber));
+          rowModel.setFeedback(rowModel.values);
+          setFeedback(rowModel.feedback);
         }}
-        board={board}
-        rowNumber={rowNumber}
+        rowNumber={rowModel.rowNumber}
         feedback={feedback}
       />
     </div>
@@ -99,28 +93,26 @@ export const Row = ({
 
 interface SlotProps {
   onClick: () => void;
-  board: GameBoardModel;
-  rowNumber: number;
+  rowModel: GameBoardRowModel;
   colNumber: number;
-  round: number;
+  currentRound: number;
 }
 
 export const Slot = ({
   onClick,
-  round,
-  board,
-  rowNumber,
+  currentRound,
+  rowModel,
   colNumber,
 }: SlotProps) => {
   const [slotValue, setSlotValue] = useState<number>(-1);
 
   return (
     <>
-      {slotValue === -1 && round === rowNumber ? (
+      {slotValue === -1 && currentRound === rowModel.rowNumber ? (
         <div
           onClick={() => {
             onClick();
-            setSlotValue(board.getSlotValue(rowNumber, colNumber));
+            setSlotValue(rowModel.getSlotValue(colNumber));
           }}
           className="w-10 h-10 flex rounded-full bg-white border-2 hover:bg-slate-300 border-black"
         ></div>
@@ -136,42 +128,47 @@ export const Slot = ({
 };
 
 interface FeedbackProps {
-  round: number;
-  board: GameBoardModel;
+  currentRound: number;
   onClick: () => void;
   rowNumber: number;
-  feedback?: FeedbackModel;
+  feedback?: number[];
 }
 
 export const Feedback = ({
-  round,
+  currentRound,
   onClick,
   rowNumber,
   feedback,
 }: FeedbackProps) => {
-  const [hints, setHints] = useState<number[]>();
+  const [populatedFeedback, setPopulatedFeedback] = useState<number[]>();
 
   useEffect(() => {
     if (feedback) {
-      setHints(feedback.getFeedback());
+      setPopulatedFeedback(feedback);
     }
   }, [feedback]);
-
-  console.log(hints);
 
   return (
     <>
       <div className="flex flex-col space-y-1">
         <div className="flex flex-row space-x-1">
-          <FeedbackCircle number={hints ? hints[0] : 0} />
-          <FeedbackCircle number={hints ? hints[1] : 0} />
+          <FeedbackCircle
+            number={populatedFeedback ? populatedFeedback[0] : 0}
+          />
+          <FeedbackCircle
+            number={populatedFeedback ? populatedFeedback[1] : 0}
+          />
         </div>
         <div className="flex flex-row space-x-1">
-          <FeedbackCircle number={hints ? hints[2] : 0} />
-          <FeedbackCircle number={hints ? hints[3] : 0} />
+          <FeedbackCircle
+            number={populatedFeedback ? populatedFeedback[2] : 0}
+          />
+          <FeedbackCircle
+            number={populatedFeedback ? populatedFeedback[3] : 0}
+          />
         </div>
       </div>
-      {rowNumber === round ? (
+      {rowNumber === currentRound ? (
         <button
           className="w-20 h-10 bg-red-500 rounded-lg"
           onClick={() => {

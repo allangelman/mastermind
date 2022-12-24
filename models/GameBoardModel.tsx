@@ -1,13 +1,12 @@
 import { FeedbackModel } from "./FeedbackModel";
+import { GameBoardRowModel } from "./GameBoardRowModel";
 import { OptionsModel } from "./OptionsModel";
 
 export class GameBoardModel {
+  private readonly options: OptionsModel;
   readonly numSlots: number;
   currentRound: number;
-  gameBoard: number[][];
-  private runningFeedback: FeedbackModel[] = [];
-  private readonly code: number[];
-  options: OptionsModel;
+  gameBoard: GameBoardRowModel[];
 
   constructor(
     numSlots: number,
@@ -16,51 +15,20 @@ export class GameBoardModel {
     code: number[]
   ) {
     this.numSlots = numSlots;
-    this.code = code;
     this.options = options;
     this.currentRound = 0;
     this.gameBoard = [];
     for (let i = 0; i < numRows; i++) {
-      const row = [];
-      for (let i = 0; i < numSlots; i++) {
-        row.push(-1);
-      }
+      const row = new GameBoardRowModel(this.numSlots, code, i);
       this.gameBoard.push(row);
     }
-  }
-
-  setSlot(row: number, col: number, value: number): void {
-    this.gameBoard[row][col] = value;
-  }
-
-  getSlotValue(row: number, col: number): number {
-    return this.gameBoard[row][col];
-  }
-
-  setFeedback(guesses: number[]): void {
-    this.runningFeedback.push(new FeedbackModel(guesses, this.code));
-  }
-
-  getFeedback(row: number): FeedbackModel {
-    if (this.runningFeedback.length > 0) {
-      return this.runningFeedback[row];
-    }
-    return new FeedbackModel([-1, -1, -1, -1], this.code);
   }
 
   incrementRound(): void {
     this.currentRound += 1;
   }
 
-  getOptions(): OptionsModel {
-    return this.options;
-  }
-
-  getGameBoard(): number[][] {
-    return this.gameBoard;
-  }
-
-  getGameBoardRow(rowNumber: number): number[] {
-    return this.gameBoard[rowNumber];
+  getCurrentOption(): number {
+    return this.options.getCurrentOption();
   }
 }

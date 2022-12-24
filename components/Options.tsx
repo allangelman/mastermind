@@ -20,7 +20,7 @@ interface RowProps {
 export const Row = ({ options }: RowProps) => {
   return (
     <div className="flex flex-row space-x-2 justify-center">
-      {options.getOptions().map((number, i) => (
+      {options.options.map((number, i) => (
         <Slot
           key={i}
           value={number}

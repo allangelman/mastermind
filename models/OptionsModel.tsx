@@ -1,6 +1,6 @@
 export class OptionsModel {
   private currentOption: number = -1;
-  private options: number[];
+  readonly options: number[];
 
   constructor(numOptions: number) {
     this.options = [];
@@ -19,9 +19,5 @@ export class OptionsModel {
 
   setCurrentOption(number: number): number {
     return (this.currentOption = number);
-  }
-
-  getOptions(): number[] {
-    return this.options;
   }
 }
