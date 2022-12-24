@@ -8,7 +8,7 @@ import { GameBoardModel } from "../models/GameBoardModel";
 import { OptionsModel } from "../models/OptionsModel";
 
 export default function Home() {
-  const [numbers, setNumbers] = useState<number[]>();
+  const [code, setCode] = useState<number[]>();
 
   useEffect(() => {
     async function fetchData() {
@@ -18,7 +18,7 @@ export default function Home() {
       const text = await response.text();
       const integers = text.split("\n").map((intString) => parseInt(intString));
       integers.pop();
-      setNumbers(integers);
+      setCode(integers);
     }
     fetchData();
   }, []);
@@ -35,13 +35,14 @@ export default function Home() {
       </Head>
       <Header />
       <div className="mx-auto w-[500px] space-y-4">
-        <div className="flex justify-center">
-          {numbers ? numbers : "Loading..."}
-        </div>
-        {numbers ? (
-          <GameBoard board={new GameBoardModel(4, 10, options, numbers)} />
+        <div className="flex justify-center">{code ? code : "Loading..."}</div>
+        {code ? (
+          <GameBoard board={new GameBoardModel(4, 10, options, code)} />
         ) : (
-          "Loading..."
+          <GameBoard
+            board={new GameBoardModel(4, 10, options, [-1, -1, -1, -1])}
+            loading
+          />
         )}
         <Options options={options} />
       </div>

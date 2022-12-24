@@ -21,7 +21,7 @@ export const GameBoard = ({ board, loading }: GameProps) => {
               rowModel={rowModel}
               numSlots={board.numSlots}
               board={board}
-              currentRound={currentRound}
+              currentRound={-1}
               setCurrentRound={setCurrentRound}
             />
           ))}
