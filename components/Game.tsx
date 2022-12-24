@@ -1,4 +1,5 @@
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { FeedbackModel } from "../models/FeedbackModel";
 import { GameBoardModel } from "../models/GameBoardModel";
 
 interface GameProps {
@@ -38,6 +39,7 @@ export const Row = ({
   round,
   setCurrentRound,
 }: RowProps) => {
+  const [feedback, setFeedback] = useState<FeedbackModel>();
   return (
     <div className="flex flex-row space-x-3 justify-center items-center">
       <div className="flex flex-row space-x-2 justify-center items-center">
@@ -60,9 +62,14 @@ export const Row = ({
         onClick={() => {
           board.incrementRound();
           setCurrentRound(board.getRound());
+          console.log("HELLO", board.getGameBoard()[rowNumber]);
+          board.setFeedback(board.getGameBoard()[rowNumber]);
+          console.log("HELLO2", board.getFeedback(rowNumber));
+          setFeedback(board.getFeedback(rowNumber));
         }}
         board={board}
         rowNumber={rowNumber}
+        feedback={feedback}
       />
     </div>
   );
@@ -111,6 +118,7 @@ interface FeedbackProps {
   board: GameBoardModel;
   onClick: () => void;
   rowNumber: number;
+  feedback?: FeedbackModel;
 }
 
 export const Feedback = ({
@@ -118,20 +126,28 @@ export const Feedback = ({
   board,
   onClick,
   rowNumber,
+  feedback,
 }: FeedbackProps) => {
-  const [currentRound, setCurrentRound] = useState<number>(0);
-  const [currentRowNumber, setCurrentRowNumber] = useState<number>(rowNumber);
+  const [hints, setHints] = useState<number[]>();
+  // const feedbackGuesses = feedback.getFeedback();
+  // console.log("feedbackGuesses: ", feedbackGuesses);
+
+  useEffect(() => {
+    if (feedback) {
+      setHints(feedback.getFeedback());
+    }
+  }, [feedback]);
 
   return (
     <>
       <div className="flex flex-col space-y-1">
         <div className="flex flex-row space-x-1">
-          <div className="w-2 h-2 rounded-full bg-white" />
-          <div className="w-2 h-2 rounded-full bg-white" />
+          <FeedbackCircle number={hints ? hints[0] : 0} />
+          <FeedbackCircle number={hints ? hints[1] : 0} />
         </div>
         <div className="flex flex-row space-x-1">
-          <div className="w-2 h-2 rounded-full bg-white" />
-          <div className="w-2 h-2 rounded-full bg-white" />
+          <FeedbackCircle number={hints ? hints[2] : 0} />
+          <FeedbackCircle number={hints ? hints[3] : 0} />
         </div>
       </div>
       {rowNumber === round ? (
@@ -139,7 +155,6 @@ export const Feedback = ({
           className="w-20 h-10 bg-red-500"
           onClick={() => {
             onClick();
-            setCurrentRound(board.getRound());
           }}
         >
           Check
@@ -147,6 +162,20 @@ export const Feedback = ({
       ) : (
         <div className="w-20 h-10 bg-blue-500"></div>
       )}
+    </>
+  );
+};
+
+interface FeedbackCircleProps {
+  number: number;
+}
+
+export const FeedbackCircle = ({ number }: FeedbackCircleProps) => {
+  return (
+    <>
+      {number === 0 && <div className="w-2 h-2 rounded-full bg-white" />}
+      {number === 1 && <div className="w-2 h-2 rounded-full bg-black" />}
+      {number === 2 && <div className="w-2 h-2 rounded-full bg-red-500" />}
     </>
   );
 };

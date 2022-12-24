@@ -25,7 +25,7 @@ export default function Home() {
   }, []);
 
   const options = new OptionsModel(8);
-  const game = new GameBoardModel(4, 10, options);
+  // const game = new GameBoardModel(4, 10, options, numbers);
 
   return (
     <>
@@ -40,7 +40,11 @@ export default function Home() {
         <div className="flex justify-center">
           {numbers ? numbers : "Loading..."}
         </div>
-        <GameBoard board={game} />
+        {numbers ? (
+          <GameBoard board={new GameBoardModel(4, 10, options, numbers)} />
+        ) : (
+          "Loading..."
+        )}
         <Options options={options} />
       </div>
     </>
