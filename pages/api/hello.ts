@@ -11,10 +11,3 @@ export default function handler(
 ) {
   res.status(200).json({ name: "John Doe" });
 }
-
-async function fetchNumbers() {
-  const response = await fetch(
-    "https://www.random.org/integers/?num=4&min=1&max=6&col=1&base=10&format=plain&rnd=new"
-  );
-  console.log(response);
-}

@@ -1,39 +1,47 @@
 import { ReactElement } from "react";
+import { OptionsModel } from "../models/OptionsModel";
 
-interface OptionsProps {}
+interface OptionsProps {
+  options: OptionsModel;
+}
 
-export const Options = ({}: OptionsProps) => {
+export const Options = ({ options }: OptionsProps) => {
   return (
     <div className="mx-auto w-[400px] bg-yellow-400">
-      <Row />
+      <Row options={options} />
     </div>
   );
 };
 
-interface RowProps {}
+interface RowProps {
+  options: OptionsModel;
+}
 
-export const Row = ({}: RowProps) => {
+export const Row = ({ options }: RowProps) => {
   return (
     <div className="flex flex-row space-x-2 justify-center">
-      <Slot value={1} />
-      <Slot value={2} />
-      <Slot value={3} />
-      <Slot value={4} />
-      <Slot value={5} />
-      <Slot value={6} />
-      <Slot value={7} />
-      <Slot value={8} />
+      {options.getOptions().map((number, i) => (
+        <Slot
+          key={i}
+          value={number}
+          onClick={() => options.setCurrentOption(number)}
+        />
+      ))}
     </div>
   );
 };
 
 interface SlotProps {
   value: number;
+  onClick: () => {};
 }
 
-export const Slot = ({ value }: SlotProps) => {
+export const Slot = ({ value, onClick }: SlotProps) => {
   return (
-    <div className="w-10 h-10 rounded-full flex justify-center items-center bg-white border border-black">
+    <div
+      onClick={onClick}
+      className="w-10  h-10 rounded-full flex justify-center items-center bg-white border hover:bg-black/50 border-black"
+    >
       {value}
     </div>
   );
