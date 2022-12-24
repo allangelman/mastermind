@@ -37,14 +37,11 @@ export class GameBoardModel {
   }
 
   setFeedback(guesses: number[]): void {
-    console.log("guesses: ", guesses);
     this.feedback.push(new FeedbackModel(guesses, this.code));
   }
 
   getFeedback(row: number): FeedbackModel {
-    console.log("lengthhhhh1", this.feedback);
     if (this.feedback.length > 0) {
-      console.log("lengthhhhh2");
       return this.feedback[row];
     }
     return new FeedbackModel([-1, -1, -1, -1], this.code);

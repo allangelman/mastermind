@@ -62,9 +62,7 @@ export const Row = ({
         onClick={() => {
           board.incrementRound();
           setCurrentRound(board.getRound());
-          console.log("HELLO", board.getGameBoard()[rowNumber]);
           board.setFeedback(board.getGameBoard()[rowNumber]);
-          console.log("HELLO2", board.getFeedback(rowNumber));
           setFeedback(board.getFeedback(rowNumber));
         }}
         board={board}
@@ -129,8 +127,6 @@ export const Feedback = ({
   feedback,
 }: FeedbackProps) => {
   const [hints, setHints] = useState<number[]>();
-  // const feedbackGuesses = feedback.getFeedback();
-  // console.log("feedbackGuesses: ", feedbackGuesses);
 
   useEffect(() => {
     if (feedback) {
@@ -174,8 +170,8 @@ export const FeedbackCircle = ({ number }: FeedbackCircleProps) => {
   return (
     <>
       {number === 0 && <div className="w-2 h-2 rounded-full bg-white" />}
-      {number === 1 && <div className="w-2 h-2 rounded-full bg-black" />}
-      {number === 2 && <div className="w-2 h-2 rounded-full bg-red-500" />}
+      {number === 1 && <div className="w-2 h-2 rounded-full bg-red-500" />}
+      {number === 2 && <div className="w-2 h-2 rounded-full bg-black" />}
     </>
   );
 };
