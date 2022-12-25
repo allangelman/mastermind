@@ -93,7 +93,7 @@ export const Row = ({
   return (
     <div className="flex flex-row space-x-3 justify-center items-center">
       <div className="flex flex-row space-x-2 justify-center items-center">
-        {Array.from(Array(numSlots)).map((peg, i) => (
+        {Array.from(Array(numSlots)).map((_, i) => (
           <Slot
             key={i}
             onClick={() => {
