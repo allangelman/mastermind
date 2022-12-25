@@ -7,6 +7,7 @@ export class GameBoardModel {
   readonly numSlots: number;
   currentRound: number;
   gameBoard: GameBoardRowModel[];
+  id: string;
   isWon: boolean = false;
   numRows: number;
 
@@ -14,9 +15,11 @@ export class GameBoardModel {
     numSlots: number,
     numRows: number,
     options: OptionsModel,
-    code: number[]
+    code: number[],
+    id: string
   ) {
     this.numSlots = numSlots;
+    this.id = id;
     this.numRows = numRows;
     this.options = options;
     this.currentRound = 0;

@@ -3,6 +3,7 @@ import { GameBoardModel } from "../models/GameBoardModel";
 import cn from "classnames";
 import { GameBoardRowModel } from "../models/GameBoardRowModel";
 import * as Dialog from "@radix-ui/react-dialog";
+import { useRouter } from "next/router";
 
 interface GameProps {
   board: GameBoardModel;
@@ -14,6 +15,7 @@ export const GameBoard = ({ board, loading }: GameProps) => {
   const [wonState, setWonState] = useState<boolean>(false);
 
   const gameEnded = wonState || (!wonState && currentRound === board.numRows);
+  const router = useRouter();
 
   return (
     <>
@@ -57,7 +59,7 @@ export const GameBoard = ({ board, loading }: GameProps) => {
               <button
                 onClick={() => {
                   setWonState(false);
-                  window.location.reload();
+                  router.push(`/`);
                 }}
                 className="w-40 h-10 flex justify-center items-center bg-green-200 hover:bg-green-300 rounded-lg"
               >

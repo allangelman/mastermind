@@ -1,27 +1,16 @@
 import Head from "next/head";
-import { useEffect, useState } from "react";
+import { useRouter } from "next/router";
+import { useEffect } from "react";
 
-import { GameBoard } from "../components/GameBoard";
-import { Header } from "../components/Header";
-import { Options } from "../components/Options";
-import { GameBoardModel } from "../models/GameBoardModel";
 import { OptionsModel } from "../models/OptionsModel";
+import { v4 as uuidv4 } from "uuid";
 
 export default function Home() {
-  const [code, setCode] = useState<number[]>();
+  const router = useRouter();
 
   useEffect(() => {
-    async function fetchData() {
-      const response = await fetch(
-        "https://www.random.org/integers/?num=4&min=0&max=7&col=1&base=10&format=plain&rnd=new"
-      );
-      const text = await response.text();
-      const integers = text.split("\n").map((intString) => parseInt(intString));
-      integers.pop();
-      setCode(integers);
-    }
-    fetchData();
-  }, []);
+    router.push(`/game/${uuidv4()}`);
+  }, [router]);
 
   const options = new OptionsModel(8);
 
@@ -33,19 +22,6 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Header />
-      <div className="mx-auto w-[500px] space-y-4">
-        <div className="flex justify-center">{code ? code : "Loading..."}</div>
-        {code ? (
-          <GameBoard board={new GameBoardModel(4, 10, options, code)} />
-        ) : (
-          <GameBoard
-            board={new GameBoardModel(4, 10, options, [-1, -1, -1, -1])}
-            loading
-          />
-        )}
-        <Options options={options} />
-      </div>
     </>
   );
 }
