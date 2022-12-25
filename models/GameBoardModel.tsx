@@ -7,6 +7,8 @@ export class GameBoardModel {
   readonly numSlots: number;
   currentRound: number;
   gameBoard: GameBoardRowModel[];
+  isWon: boolean = false;
+  numRows: number;
 
   constructor(
     numSlots: number,
@@ -15,6 +17,7 @@ export class GameBoardModel {
     code: number[]
   ) {
     this.numSlots = numSlots;
+    this.numRows = numRows;
     this.options = options;
     this.currentRound = 0;
     this.gameBoard = [];
@@ -30,5 +33,11 @@ export class GameBoardModel {
 
   getCurrentOption(): number {
     return this.options.getCurrentOption();
+  }
+
+  checkWonState(rowNumber: number): boolean {
+    const rowFeedback = this.gameBoard[rowNumber].feedback;
+    const wonState = [2, 2, 2, 2];
+    return rowFeedback.every((val, index) => val === wonState[index]);
   }
 }
