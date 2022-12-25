@@ -1,6 +1,6 @@
-import { FeedbackModel } from "./FeedbackModel";
 import { GameBoardRowModel } from "./GameBoardRowModel";
 import { OptionsModel } from "./OptionsModel";
+import { PlayerModel } from "./PlayerModel";
 
 export class GameBoardModel {
   private readonly options: OptionsModel;
@@ -10,6 +10,7 @@ export class GameBoardModel {
   id: string;
   isWon: boolean = false;
   numRows: number;
+  players: PlayerModel[] = [];
 
   constructor(
     numSlots: number,
@@ -24,6 +25,7 @@ export class GameBoardModel {
     this.options = options;
     this.currentRound = 0;
     this.gameBoard = [];
+
     for (let i = 0; i < numRows; i++) {
       const row = new GameBoardRowModel(this.numSlots, code, i);
       this.gameBoard.push(row);
@@ -42,5 +44,9 @@ export class GameBoardModel {
     const rowFeedback = this.gameBoard[rowNumber].feedback;
     const wonState = [2, 2, 2, 2];
     return rowFeedback.every((val, index) => val === wonState[index]);
+  }
+
+  addPlayer(player: PlayerModel): void {
+    this.players.push(player);
   }
 }

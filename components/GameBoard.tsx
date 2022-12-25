@@ -4,6 +4,8 @@ import cn from "classnames";
 import { GameBoardRowModel } from "../models/GameBoardRowModel";
 import * as Dialog from "@radix-ui/react-dialog";
 import { useRouter } from "next/router";
+import { PlayerModel } from "../models/PlayerModel";
+import { v4 as uuidv4 } from "uuid";
 
 interface GameProps {
   board: GameBoardModel;
@@ -13,6 +15,9 @@ interface GameProps {
 export const GameBoard = ({ board, loading }: GameProps) => {
   const [currentRound, setCurrentRound] = useState<number>(0);
   const [wonState, setWonState] = useState<boolean>(false);
+  const [isButtonDisabled, setButtonDisabled] = useState<boolean>(true);
+  const [currentPlayer, setCurrentPlayer] = useState<PlayerModel>();
+  const [inputValue, setInputValue] = useState<string>("");
 
   const gameEnded = wonState || (!wonState && currentRound === board.numRows);
   const router = useRouter();
@@ -34,18 +39,50 @@ export const GameBoard = ({ board, loading }: GameProps) => {
           ))}
         </div>
       ) : (
-        <div className="mx-auto w-[300px] space-y-2">
-          {board.gameBoard.map((rowModel, i) => (
-            <Row
-              key={i}
-              rowModel={rowModel}
-              numSlots={board.numSlots}
-              board={board}
-              currentRound={currentRound}
-              setCurrentRound={setCurrentRound}
-              setWonState={setWonState}
-            />
-          ))}
+        <div className="mx-auto flex flex-col items-center w-[300px] space-y-4">
+          <div className="flex flex-row space-x-2">
+            {currentPlayer ? (
+              <div>{currentPlayer.name}</div>
+            ) : (
+              <>
+                <input
+                  className="w-30 h-10 rounded-lg border-2"
+                  value={inputValue}
+                  onChange={(e) => {
+                    setInputValue(e.target.value);
+                    setButtonDisabled(e.target.value === "");
+                  }}
+                ></input>
+                <button
+                  className={cn("w-20 rounded-lg h-10 ", {
+                    "bg-green-100": isButtonDisabled,
+                    "bg-green-300": !isButtonDisabled,
+                  })}
+                  onClick={() =>
+                    setCurrentPlayer(
+                      new PlayerModel(uuidv4(), inputValue, board)
+                    )
+                  }
+                  disabled={isButtonDisabled}
+                >
+                  Login
+                </button>
+              </>
+            )}
+          </div>
+          <div className="flex flex-col space-y-2">
+            {board.gameBoard.map((rowModel, i) => (
+              <Row
+                key={i}
+                rowModel={rowModel}
+                numSlots={board.numSlots}
+                board={board}
+                currentRound={currentRound}
+                setCurrentRound={setCurrentRound}
+                setWonState={setWonState}
+              />
+            ))}
+          </div>
         </div>
       )}
       <Dialog.Root open={gameEnded} onOpenChange={() => {}}>
