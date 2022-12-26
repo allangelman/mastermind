@@ -2,7 +2,7 @@
 
 set -eux
 
-pushd api
+pushd .
 
 npm install
 npm run build
