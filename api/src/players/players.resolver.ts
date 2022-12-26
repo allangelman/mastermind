@@ -19,10 +19,10 @@ export class PlayersResolver {
   //   return this.playersService.findAll();
   // }
 
-  // @Query(() => Player, { name: 'player' })
-  // findOne(@Args('id', { type: () => Int }) id: number) {
-  //   return this.playersService.findOne(id);
-  // }
+  @Query(() => Player, { name: 'findPlayerByName' })
+  findOne(@Args('name') name: string) {
+    return this.playersService.findOneByName(name);
+  }
 
   // @Mutation(() => Player)
   // updatePlayer(@Args('updatePlayerInput') updatePlayerInput: UpdatePlayerInput) {

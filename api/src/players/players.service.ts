@@ -23,9 +23,9 @@ export class PlayersService {
   //   return `This action returns all players`;
   // }
 
-  // findOne(id: number) {
-  //   return `This action returns a #${id} player`;
-  // }
+  findOneByName(name: string) {
+    return this.playersRepository.findOneBy({ name });
+  }
 
   // update(id: number, updatePlayerInput: UpdatePlayerInput) {
   //   return `This action updates a #${id} player`;
