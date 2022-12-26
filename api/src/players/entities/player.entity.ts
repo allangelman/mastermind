@@ -14,7 +14,7 @@ export class Player {
   id!: string;
 
   @Field({ description: 'name of the player.' })
-  @Column({ name: 'name', type: 'string' })
+  @Column({ name: 'name' })
   name!: string;
 
   @Field({ description: 'Creation timestamp of the note.' })
