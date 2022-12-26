@@ -7,7 +7,7 @@ import { Column } from 'typeorm/decorator/columns/Column';
 import { UpdateDateColumn } from 'typeorm/decorator/columns/UpdateDateColumn';
 
 @ObjectType({ description: 'Represents information about a player.' })
-@Entity('notes')
+@Entity('players')
 export class Player {
   @Field(() => ID, { description: 'ID of the player.' })
   @PrimaryGeneratedColumn('uuid')

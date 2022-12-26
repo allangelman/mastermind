@@ -19,7 +19,7 @@ export class PlayerModel {
   }
 
   async persistPlayerData(name: string) {
-    const endpoint = " https://mastermind-api.onrender.com";
+    const endpoint = " https://mastermind-api.onrender.com/graphql";
 
     const graphQLClient = new GraphQLClient(endpoint);
 
@@ -32,7 +32,7 @@ export class PlayerModel {
     `;
 
     const variables = {
-      name,
+      createPlayerInput: { name },
     };
 
     const data = await graphQLClient.request(mutation, variables);
