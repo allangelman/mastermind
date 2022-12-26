@@ -22,6 +22,12 @@ export const GameBoard = ({ board, loading }: GameProps) => {
   const gameEnded = wonState || (!wonState && currentRound === board.numRows);
   const router = useRouter();
 
+  useEffect(() => {
+    if (currentPlayer) {
+      currentPlayer.persistPlayerData(inputValue);
+    }
+  }, [currentPlayer]);
+
   return (
     <>
       {loading ? (
@@ -58,11 +64,11 @@ export const GameBoard = ({ board, loading }: GameProps) => {
                     "bg-green-100": isButtonDisabled,
                     "bg-green-300": !isButtonDisabled,
                   })}
-                  onClick={() =>
+                  onClick={() => {
                     setCurrentPlayer(
                       new PlayerModel(uuidv4(), inputValue, board)
-                    )
-                  }
+                    );
+                  }}
                   disabled={isButtonDisabled}
                 >
                   Login
