@@ -12,6 +12,7 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
       driver: ApolloDriver,
       // debug: process.env.NODE_ENV === 'development',
       // playground: process.env.NODE_ENV === 'development',
+      autoSchemaFile: true,
       debug: true,
       playground: true,
     }),
