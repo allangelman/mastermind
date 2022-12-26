@@ -1,6 +1,7 @@
 import { GameBoardRowModel } from "./GameBoardRowModel";
 import { OptionsModel } from "./OptionsModel";
 import { PlayerModel } from "./PlayerModel";
+import { GraphQLClient, gql } from "graphql-request";
 
 export class GameBoardModel {
   private readonly options: OptionsModel;
@@ -48,5 +49,20 @@ export class GameBoardModel {
 
   addPlayer(player: PlayerModel): void {
     this.players.push(player);
+  }
+
+  async checkNameAvailablity(name: string) {
+    const endpoint = " https://mastermind-api.onrender.com/graphql";
+
+    const graphQLClient = new GraphQLClient(endpoint);
+
+    const query = gql`
+      query findAllPlayerNames {
+        findAllPlayerNames
+      }
+    `;
+
+    const data = await graphQLClient.request(query);
+    console.log("data: ", data);
   }
 }

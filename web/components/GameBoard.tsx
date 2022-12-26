@@ -60,6 +60,18 @@ export const GameBoard = ({ board, loading }: GameProps) => {
                   }}
                 ></input>
                 <button
+                  className={cn("w-40 rounded-lg h-10 ", {
+                    "bg-green-100": isButtonDisabled,
+                    "bg-green-300": !isButtonDisabled,
+                  })}
+                  onClick={async () => {
+                    await board.checkNameAvailablity(inputValue);
+                  }}
+                  disabled={isButtonDisabled}
+                >
+                  Check Availablity
+                </button>
+                <button
                   className={cn("w-20 rounded-lg h-10 ", {
                     "bg-green-100": isButtonDisabled,
                     "bg-green-300": !isButtonDisabled,

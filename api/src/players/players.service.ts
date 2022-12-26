@@ -11,7 +11,7 @@ export class PlayersService {
     private playersRepository: Repository<Player>,
   ) {}
 
-  async create(createPlayerInput: CreatePlayerInput) {
+  async create(createPlayerInput: CreatePlayerInput): Promise<Player> {
     let player = new Player();
 
     player.name = createPlayerInput.name;
@@ -19,11 +19,13 @@ export class PlayersService {
     return player;
   }
 
-  // findAll() {
-  //   return `This action returns all players`;
-  // }
+  async findAllNames(): Promise<string[]> {
+    const players = await this.playersRepository.find();
+    const playerNames = players.map((player) => player.name);
+    return playerNames;
+  }
 
-  findOneByName(name: string) {
+  findOneByName(name: string): Promise<Player> {
     return this.playersRepository.findOneBy({ name });
   }
 

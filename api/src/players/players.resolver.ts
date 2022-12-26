@@ -10,17 +10,17 @@ export class PlayersResolver {
   @Mutation(() => Player)
   createPlayer(
     @Args('createPlayerInput') createPlayerInput: CreatePlayerInput,
-  ) {
+  ): Promise<Player> {
     return this.playersService.create(createPlayerInput);
   }
 
-  // @Query(() => [Player], { name: 'players' })
-  // findAll() {
-  //   return this.playersService.findAll();
-  // }
+  @Query(() => [String], { name: 'findAllPlayerNames' })
+  findAllPlayerNames(): Promise<string[]> {
+    return this.playersService.findAllNames();
+  }
 
   @Query(() => Player, { name: 'findPlayerByName' })
-  findOne(@Args('name') name: string) {
+  findOne(@Args('name') name: string): Promise<Player> {
     return this.playersService.findOneByName(name);
   }
 
