@@ -1,10 +1,6 @@
 import { GameBoardModel } from "./GameBoardModel";
 import { GraphQLClient, gql } from "graphql-request";
 
-interface CreatePlayerInput {
-  name: string;
-}
-
 export class PlayerModel {
   allGames: GameBoardModel[] = [];
   currentGame: GameBoardModel;

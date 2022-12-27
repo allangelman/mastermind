@@ -1,18 +1,29 @@
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
-import { OptionsModel } from "../models/OptionsModel";
 import { v4 as uuidv4 } from "uuid";
 
 export default function Home() {
   const router = useRouter();
+  const [code, setCode] = useState<number[]>();
+
+  useEffect(() => {
+    async function fetchData() {
+      const response = await fetch(
+        "https://www.random.org/integers/?num=4&min=0&max=7&col=1&base=10&format=plain&rnd=new"
+      );
+      const text = await response.text();
+      const integers = text.split("\n").map((intString) => parseInt(intString));
+      integers.pop();
+      setCode(integers);
+    }
+    fetchData();
+  }, []);
 
   useEffect(() => {
     router.push(`/game/${uuidv4()}`);
   }, [router]);
-
-  const options = new OptionsModel(8);
 
   return (
     <>

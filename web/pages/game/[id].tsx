@@ -1,11 +1,13 @@
 import { GetServerSideProps } from "next";
 import Head from "next/head";
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
 import { GameBoard } from "../../components/GameBoard";
 import { Header } from "../../components/Header";
 import { Options } from "../../components/Options";
 import { GameBoardModel } from "../../models/GameBoardModel";
+import { GameModel } from "../../models/GameModel";
 import { OptionsModel } from "../../models/OptionsModel";
 
 type GamePageProps = {
@@ -14,6 +16,8 @@ type GamePageProps = {
 
 export default function GamePage({ id }: GamePageProps) {
   const [code, setCode] = useState<number[]>();
+  // const [game, setGame] = useState<GameModel>();
+  const router = useRouter();
 
   useEffect(() => {
     async function fetchData() {
@@ -24,10 +28,32 @@ export default function GamePage({ id }: GamePageProps) {
       const integers = text.split("\n").map((intString) => parseInt(intString));
       integers.pop();
       setCode(integers);
+      // setGame(new GameModel(4, 10, options, integers, id));
     }
+
     fetchData();
   }, []);
 
+  // useEffect(() => {
+  //   if (code) {
+  //     console.log("SETGAME");
+  //     setGame(new GameModel(4, 10, options, code, id));
+  //   }
+  // }, [code]);
+
+  // useEffect(() => {
+  //   console.log("Router:", router.query.gameboard);
+  //   if (game && !router.query.gameboard) {
+  //     router.push({
+  //       pathname: `/game/${game.id}`,
+  //       query: {
+  //         gameboard: game.gameBoards[0].id,
+  //       },
+  //     });
+  //   }
+  // }, [game]);
+
+  // console.log("GAME: ", game, game?.id);
   const options = new OptionsModel(8);
 
   return (
@@ -42,10 +68,10 @@ export default function GamePage({ id }: GamePageProps) {
       <div className="mx-auto w-[500px] space-y-2">
         <div className="flex justify-center">{code ? code : "Loading..."}</div>
         {code ? (
-          <GameBoard board={new GameBoardModel(4, 10, options, code, id)} />
+          <GameBoard game={new GameModel(4, 10, options, code, id)} />
         ) : (
           <GameBoard
-            board={new GameBoardModel(4, 10, options, [-1, -1, -1, -1], id)}
+            game={new GameModel(4, 10, options, [-1, -1, -1, -1], id)}
             loading
           />
         )}

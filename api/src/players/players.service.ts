@@ -28,12 +28,4 @@ export class PlayersService {
   findOneByName(name: string): Promise<Player> {
     return this.playersRepository.findOneBy({ name });
   }
-
-  // update(id: number, updatePlayerInput: UpdatePlayerInput) {
-  //   return `This action updates a #${id} player`;
-  // }
-
-  // remove(id: number) {
-  //   return `This action removes a #${id} player`;
-  // }
 }

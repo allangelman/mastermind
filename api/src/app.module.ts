@@ -5,6 +5,8 @@ import { PlayersModule } from './players/players.module';
 import { GraphQLModule } from '@nestjs/graphql';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+import { GamesModule } from './games/games.module';
+import { GameBoardsModule } from './game_boards/game_boards.module';
 
 @Module({
   imports: [
@@ -27,6 +29,8 @@ import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
       synchronize: false,
     }),
     PlayersModule,
+    GamesModule,
+    GameBoardsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

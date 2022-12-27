@@ -6,13 +6,14 @@ import * as Dialog from "@radix-ui/react-dialog";
 import { useRouter } from "next/router";
 import { PlayerModel } from "../models/PlayerModel";
 import { v4 as uuidv4 } from "uuid";
+import { GameModel } from "../models/GameModel";
 
 interface GameProps {
-  board: GameBoardModel;
+  game: GameModel;
   loading?: boolean;
 }
 
-export const GameBoard = ({ board, loading }: GameProps) => {
+export const GameBoard = ({ game, loading }: GameProps) => {
   const [currentRound, setCurrentRound] = useState<number>(0);
   const [wonState, setWonState] = useState<boolean>(false);
   const [isButtonDisabled, setButtonDisabled] = useState<boolean>(true);
@@ -20,16 +21,36 @@ export const GameBoard = ({ board, loading }: GameProps) => {
   const [inputValue, setInputValue] = useState<string>("");
   const [isNameAvailable, setIsNameAvailable] = useState<boolean>(true);
 
+  const board = game.gameBoards[0];
   const gameEnded = wonState || (!wonState && currentRound === board.numRows);
   const router = useRouter();
 
+  // router.push({
+  //   pathname: `/game/${game.id}`,
+  //   query: {
+  //     gameboard: board.id,
+  //   },
+  // });
+
   useEffect(() => {
-    setTimeout(() => {
-      if (!isNameAvailable) {
-        setIsNameAvailable(true);
-      }
-    }, 3000);
-  }, [isNameAvailable]);
+    // console.log("Router:", router.query.gameboard);
+    // if (!router.query.gameboard) {
+    router.push({
+      pathname: `/game/${game.id}`,
+      query: {
+        gameboard: board.id,
+      },
+    });
+    // }
+  }, []);
+
+  // useEffect(() => {
+  //   setTimeout(() => {
+  //     if (!isNameAvailable) {
+  //       setIsNameAvailable(true);
+  //     }
+  //   }, 3000);
+  // }, [isNameAvailable]);
 
   return (
     <>

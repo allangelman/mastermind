@@ -64,8 +64,6 @@ export class GameBoardModel {
 
     const { findAllPlayerNames } = await graphQLClient.request(query);
 
-    console.log(findAllPlayerNames, findAllPlayerNames.includes(name), name);
-
     if (findAllPlayerNames.includes(name)) {
       return false;
     } else {
