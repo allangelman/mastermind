@@ -18,7 +18,7 @@ export class PlayerModel {
     this.allGames.push(this.currentGame);
   }
 
-  async persistPlayerData(name: string) {
+  async persistPlayerData(name: string): Promise<void> {
     const endpoint = " https://mastermind-api.onrender.com/graphql";
 
     const graphQLClient = new GraphQLClient(endpoint);
@@ -35,7 +35,10 @@ export class PlayerModel {
       createPlayerInput: { name },
     };
 
-    const data = await graphQLClient.request(mutation, variables);
-    console.log("data: ", data);
+    try {
+      const data = await graphQLClient.request(mutation, variables);
+    } catch (error) {
+      throw error;
+    }
   }
 }

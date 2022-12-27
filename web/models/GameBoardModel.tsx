@@ -51,7 +51,7 @@ export class GameBoardModel {
     this.players.push(player);
   }
 
-  async checkNameAvailablity(name: string) {
+  async checkNameAvailablity(name: string): Promise<boolean> {
     const endpoint = " https://mastermind-api.onrender.com/graphql";
 
     const graphQLClient = new GraphQLClient(endpoint);
@@ -62,7 +62,14 @@ export class GameBoardModel {
       }
     `;
 
-    const data = await graphQLClient.request(query);
-    console.log("data: ", data);
+    const { findAllPlayerNames } = await graphQLClient.request(query);
+
+    console.log(findAllPlayerNames, findAllPlayerNames.includes(name), name);
+
+    if (findAllPlayerNames.includes(name)) {
+      return false;
+    } else {
+      return true;
+    }
   }
 }

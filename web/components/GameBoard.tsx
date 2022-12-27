@@ -18,15 +18,18 @@ export const GameBoard = ({ board, loading }: GameProps) => {
   const [isButtonDisabled, setButtonDisabled] = useState<boolean>(true);
   const [currentPlayer, setCurrentPlayer] = useState<PlayerModel>();
   const [inputValue, setInputValue] = useState<string>("");
+  const [isNameAvailable, setIsNameAvailable] = useState<boolean>(true);
 
   const gameEnded = wonState || (!wonState && currentRound === board.numRows);
   const router = useRouter();
 
   useEffect(() => {
-    if (currentPlayer) {
-      currentPlayer.persistPlayerData(inputValue);
-    }
-  }, [currentPlayer]);
+    setTimeout(() => {
+      if (!isNameAvailable) {
+        setIsNameAvailable(true);
+      }
+    }, 3000);
+  }, [isNameAvailable]);
 
   return (
     <>
@@ -65,25 +68,18 @@ export const GameBoard = ({ board, loading }: GameProps) => {
                     "bg-green-300": !isButtonDisabled,
                   })}
                   onClick={async () => {
-                    await board.checkNameAvailablity(inputValue);
+                    const player = new PlayerModel(uuidv4(), inputValue, board);
+                    try {
+                      await player.persistPlayerData(inputValue);
+                      setCurrentPlayer(player);
+                      setIsNameAvailable(true);
+                    } catch {
+                      setIsNameAvailable(false);
+                    }
                   }}
                   disabled={isButtonDisabled}
                 >
-                  Check Availablity
-                </button>
-                <button
-                  className={cn("w-20 rounded-lg h-10 ", {
-                    "bg-green-100": isButtonDisabled,
-                    "bg-green-300": !isButtonDisabled,
-                  })}
-                  onClick={() => {
-                    setCurrentPlayer(
-                      new PlayerModel(uuidv4(), inputValue, board)
-                    );
-                  }}
-                  disabled={isButtonDisabled}
-                >
-                  Login
+                  {!isNameAvailable ? "Username taken" : "Login / Signup"}
                 </button>
               </>
             )}
