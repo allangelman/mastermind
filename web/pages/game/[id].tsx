@@ -16,8 +16,6 @@ type GamePageProps = {
 
 export default function GamePage({ id }: GamePageProps) {
   const [code, setCode] = useState<number[]>();
-  // const [game, setGame] = useState<GameModel>();
-  const router = useRouter();
 
   useEffect(() => {
     async function fetchData() {
@@ -28,32 +26,11 @@ export default function GamePage({ id }: GamePageProps) {
       const integers = text.split("\n").map((intString) => parseInt(intString));
       integers.pop();
       setCode(integers);
-      // setGame(new GameModel(4, 10, options, integers, id));
     }
 
     fetchData();
   }, []);
 
-  // useEffect(() => {
-  //   if (code) {
-  //     console.log("SETGAME");
-  //     setGame(new GameModel(4, 10, options, code, id));
-  //   }
-  // }, [code]);
-
-  // useEffect(() => {
-  //   console.log("Router:", router.query.gameboard);
-  //   if (game && !router.query.gameboard) {
-  //     router.push({
-  //       pathname: `/game/${game.id}`,
-  //       query: {
-  //         gameboard: game.gameBoards[0].id,
-  //       },
-  //     });
-  //   }
-  // }, [game]);
-
-  // console.log("GAME: ", game, game?.id);
   const options = new OptionsModel(8);
 
   return (
