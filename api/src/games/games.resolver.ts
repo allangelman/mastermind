@@ -8,7 +8,7 @@ export class GamesResolver {
   constructor(private readonly gamesService: GamesService) {}
 
   @Mutation(() => Game)
-  createPlayer(
+  createGame(
     @Args('createGameInput') createGameInput: CreateGameInput,
   ): Promise<Game> {
     return this.gamesService.create(createGameInput);
