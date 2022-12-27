@@ -6,16 +6,28 @@ import { CreateDateColumn } from 'typeorm/decorator/columns/CreateDateColumn';
 import { Column } from 'typeorm/decorator/columns/Column';
 import { UpdateDateColumn } from 'typeorm/decorator/columns/UpdateDateColumn';
 
-@ObjectType({ description: 'Represents information about a game.' })
-@Entity('games')
-export class Game {
-  @Field(() => ID, { description: 'ID of the game.' })
+@ObjectType({ description: 'Represents information about a game row.' })
+@Entity('game_rows')
+export class GameRow {
+  @Field(() => ID, { description: 'ID of the game row.' })
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Field({ description: 'code for the game.' })
-  @Column({ name: 'code' })
-  code!: number;
+  @Field({ description: 'number of the game row.' })
+  @Column({ name: 'row_num' })
+  row_num!: number;
+
+  @Field({ description: 'id of the game_board.' })
+  @Column({ name: 'game_board_id' })
+  game_board_id!: string;
+
+  @Field({ description: 'feedback.' })
+  @Column({ name: 'feedback', nullable: true })
+  feedback?: number;
+
+  @Field({ description: 'values.' })
+  @Column({ name: 'values' })
+  values!: number;
 
   @Field({ description: 'Creation timestamp of the game.' })
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })

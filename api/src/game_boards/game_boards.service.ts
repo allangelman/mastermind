@@ -8,14 +8,14 @@ import { Repository } from 'typeorm';
 export class GameBoardsService {
   constructor(
     @InjectRepository(GameBoard)
-    private gamesRepository: Repository<GameBoard>,
+    private gameBoardsRepository: Repository<GameBoard>,
   ) {}
 
   async create(createGameBoardInput: CreateGameBoardInput): Promise<GameBoard> {
     let gameBoard = new GameBoard();
 
     gameBoard.game_id = createGameBoardInput.game_id;
-    gameBoard = await this.gamesRepository.save(gameBoard);
+    gameBoard = await this.gameBoardsRepository.save(gameBoard);
     return gameBoard;
   }
 
@@ -24,7 +24,7 @@ export class GameBoardsService {
   // }
 
   findOneById(id: string) {
-    return this.gamesRepository.findOneBy({ id });
+    return this.gameBoardsRepository.findOneBy({ id });
   }
 
   // remove(id: number) {

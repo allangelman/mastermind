@@ -7,6 +7,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { GamesModule } from './games/games.module';
 import { GameBoardsModule } from './game_boards/game_boards.module';
+import { GameRowsModule } from './game_rows/game_rows.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { GameBoardsModule } from './game_boards/game_boards.module';
     PlayersModule,
     GamesModule,
     GameBoardsModule,
+    GameRowsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
