@@ -14,7 +14,7 @@ export class Game {
   id!: string;
 
   @Field({ description: 'code for the game.' })
-  @Column('int', { name: 'code', array: true })
+  @Column('integer', { name: 'code', array: true })
   code!: number[];
 
   @Field({ description: 'Creation timestamp of the game.' })
