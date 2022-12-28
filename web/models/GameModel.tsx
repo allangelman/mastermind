@@ -30,33 +30,6 @@ export class GameModel {
     );
   }
 
-  async persistGameData(): Promise<void> {
-    const endpoint = " https://mastermind-api.onrender.com/graphql";
-
-    const graphQLClient = new GraphQLClient(endpoint);
-
-    const mutation = gql`
-      mutation createGame($createGameInput: CreateGameInput!) {
-        createGame(createGameInput: $createGameInput) {
-          code
-        }
-      }
-    `;
-    const code = parseFloat(this.code.join(""));
-
-    console.log("CODE: ", code, this.code.join(""));
-
-    const variables = {
-      createGameInput: { code },
-    };
-
-    try {
-      const data = await graphQLClient.request(mutation, variables);
-    } catch (error) {
-      throw error;
-    }
-  }
-
   addGameBoard(): void {
     this.gameBoards.push(
       new GameBoardModel(

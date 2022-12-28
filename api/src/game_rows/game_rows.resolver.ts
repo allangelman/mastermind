@@ -1,4 +1,4 @@
-import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
 import { GameRowsService } from './game_rows.service';
 import { GameRow } from './entities/game_row.entity';
 import { CreateGameRowInput } from './dto/create-game_row.input';

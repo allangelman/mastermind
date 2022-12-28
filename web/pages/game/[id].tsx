@@ -8,18 +8,12 @@ import { GameModel } from "../../models/GameModel";
 import { OptionsModel } from "../../models/OptionsModel";
 
 type GamePageProps = {
-  integers: number[];
+  code: string;
   game_id: string;
   board_id: string;
 };
 
-export default function GamePage({
-  integers,
-  game_id,
-  board_id,
-}: GamePageProps) {
-  console.log("INTEGEGS", integers);
-
+export default function GamePage({ code, game_id, board_id }: GamePageProps) {
   const options = new OptionsModel(8);
 
   return (
@@ -32,10 +26,19 @@ export default function GamePage({
       </Head>
       <Header />
       <div className="mx-auto w-[500px] space-y-2">
-        <div className="flex justify-center">{integers}</div>
+        <div className="flex justify-center">{code}</div>
 
         <GameBoard
-          game={new GameModel(4, 10, options, integers, game_id, board_id)}
+          game={
+            new GameModel(
+              4,
+              10,
+              options,
+              code.split("").map((char) => parseInt(char)),
+              game_id,
+              board_id
+            )
+          }
         />
         <Options options={options} />
       </div>
@@ -52,7 +55,7 @@ export const getServerSideProps: GetServerSideProps<
   const graphQLClient = new GraphQLClient(endpoint);
 
   const queryy = gql`
-    query findGameById($id: String!) {
+    query findGameById($id: ID!) {
       findGameById(id: $id) {
         code
         id
@@ -68,9 +71,9 @@ export const getServerSideProps: GetServerSideProps<
 
   return {
     props: {
-      integers: data.findGameById.code,
+      code: data.findGameById.code,
       game_id: params?.id ?? "",
-      board_id: typeof query?.gameboard === "string" ? query?.gameboard : "",
+      board_id: typeof query?.boardId === "string" ? query?.boardId : "",
     },
   };
 };

@@ -17,7 +17,7 @@ export default function Home({ game_id, board_id }: GamePageProps) {
   const router = useRouter();
 
   useEffect(() => {
-    router.push(`/game/${game_id}?gameboard=${board_id}`);
+    router.push(`/game/${game_id}?boardId=${board_id}`);
   }, [router]);
 
   return (
@@ -38,9 +38,9 @@ export const getServerSideProps: GetServerSideProps<
   const response = await fetch(
     "https://www.random.org/integers/?num=4&min=0&max=7&col=1&base=10&format=plain&rnd=new"
   );
-  const code = await response.text();
-  const integers = code.split("\n").map((intString) => parseInt(intString));
-  integers.pop();
+  const codeWithNewLines = await response.text();
+  const codeArray = codeWithNewLines.split("\n");
+  const code = codeArray.join("");
 
   const endpoint = " https://mastermind-api.onrender.com/graphql";
 
@@ -54,10 +54,9 @@ export const getServerSideProps: GetServerSideProps<
       }
     }
   `;
-  const oneNumberCode = parseFloat(integers.join(""));
 
   const variables = {
-    createGameInput: { code: oneNumberCode },
+    createGameInput: { code },
   };
 
   const data = await graphQLClient.request(mutation, variables);
@@ -75,7 +74,7 @@ export const getServerSideProps: GetServerSideProps<
   };
 
   const data2 = await graphQLClient.request(mutation2, variables2);
-  console.log("DATAA2222: ", data2);
+  // console.log("DATAA2222: ", data2);
 
   return {
     props: { game_id: data.createGame.id, board_id: data2.createGameBoard.id },

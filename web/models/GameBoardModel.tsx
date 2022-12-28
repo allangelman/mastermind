@@ -31,33 +31,35 @@ export class GameBoardModel {
     this.gameBoard = [];
 
     for (let i = 0; i < numRows; i++) {
-      const row = new GameBoardRowModel(this.numSlots, code, i);
+      const row = new GameBoardRowModel(this.numSlots, code, i, this.id);
       this.gameBoard.push(row);
     }
   }
 
-  async persistGameData(): Promise<void> {
+  async loadRows() {
     const endpoint = " https://mastermind-api.onrender.com/graphql";
 
     const graphQLClient = new GraphQLClient(endpoint);
 
-    const mutation = gql`
-      mutation createGameBoard($createGameBoardInput: CreateGameBoardInput!) {
-        createGameBoard(createGameBoardInput: $createGameBoardInput) {
-          game_id
+    const queryy = gql`
+      query findGameBoardById($id: ID!) {
+        findGameBoardById(id: $id) {
+          row {
+            row_num
+            values
+            feedback
+            id
+          }
         }
       }
     `;
 
     const variables = {
-      createGameBoardInput: { game_id: this.gameId },
+      id: this.id,
     };
 
-    try {
-      const data = await graphQLClient.request(mutation, variables);
-    } catch (error) {
-      throw error;
-    }
+    const data = await graphQLClient.request(queryy, variables);
+    console.log(data);
   }
 
   incrementRound(): void {

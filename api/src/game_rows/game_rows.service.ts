@@ -26,4 +26,8 @@ export class GameRowsService {
   findOneById(id: string) {
     return this.gameRowsRepository.findOneBy({ id });
   }
+
+  findByBoardId(boardId: string): Promise<GameRow[]> {
+    return this.gameRowsRepository.find({ where: { game_board_id: boardId } });
+  }
 }

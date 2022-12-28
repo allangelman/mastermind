@@ -25,38 +25,9 @@ export const GameBoard = ({ game, loading }: GameProps) => {
   const gameEnded = wonState || (!wonState && currentRound === board.numRows);
   const router = useRouter();
 
-  console.log(game);
-
-  // router.push({
-  //   pathname: `/game/${game.id}`,
-  //   query: {
-  //     gameboard: board.id,
-  //   },
-  // });
-  // game.persistGameData();
-  // board.persistGameData();
-
-  // useEffect(() => {
-  //   // console.log("Router:", router.query.gameboard);
-  //   if (!router.query.gameboard && !loading) {
-  //     router.push({
-  //       pathname: `/game/${game.id}`,
-  //       query: {
-  //         gameboard: board.id,
-  //       },
-  //     });
-  //     game.persistGameData();
-  //     // board.persistGameData();
-  //   }
-  // }, [loading]);
-
-  // useEffect(() => {
-  //   setTimeout(() => {
-  //     if (!isNameAvailable) {
-  //       setIsNameAvailable(true);
-  //     }
-  //   }, 3000);
-  // }, [isNameAvailable]);
+  useEffect(() => {
+    board.loadRows();
+  }, [board]);
 
   return (
     <>
@@ -193,6 +164,7 @@ export const Row = ({
           rowModel.setFeedback(rowModel.values);
           setFeedback(rowModel.feedback);
           setWonState(board.checkWonState(rowModel.rowNumber));
+          rowModel.saveRow();
         }}
         rowNumber={rowModel.rowNumber}
         feedback={feedback}
