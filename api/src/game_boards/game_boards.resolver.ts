@@ -12,6 +12,7 @@ import { GameBoard } from './entities/game_board.entity';
 import { CreateGameBoardInput } from './dto/create-game_board.input';
 import { GameRow } from 'src/game_rows/entities/game_row.entity';
 import { GameRowsService } from 'src/game_rows/game_rows.service';
+import { UpdateGameBoardInput } from './dto/update-game_board.input';
 
 @Resolver(() => GameBoard)
 export class GameBoardsResolver {
@@ -29,10 +30,12 @@ export class GameBoardsResolver {
 
   @Mutation(() => GameBoard)
   updateGameResult(
-    @Args('id', { type: () => ID, description: 'ID of the board.' }) id: string,
-    @Args('result') result: string,
+    @Args('updateGameBoardInput') updateGameBoardInput: UpdateGameBoardInput,
   ): Promise<GameBoard> {
-    return this.gameBoardsService.updateResult(id, result);
+    return this.gameBoardsService.updateResult(
+      updateGameBoardInput.id,
+      updateGameBoardInput.result,
+    );
   }
 
   @Query(() => GameBoard, { name: 'findGameBoardById' })
