@@ -22,12 +22,12 @@ export class GameRow {
   game_board_id!: string;
 
   @Field({ description: 'feedback.' })
-  @Column({ name: 'feedback', nullable: true })
-  feedback?: number;
+  @Column({ name: 'feedback' })
+  feedback: string;
 
   @Field({ description: 'values.' })
   @Column({ name: 'values' })
-  values!: number;
+  values!: string;
 
   @Field({ description: 'Creation timestamp of the game.' })
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })

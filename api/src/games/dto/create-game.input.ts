@@ -5,5 +5,5 @@ import { InputType, Int, Field } from '@nestjs/graphql';
 })
 export class CreateGameInput {
   @Field({ description: 'code' })
-  code: number;
+  code: string;
 }

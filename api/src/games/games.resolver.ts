@@ -1,4 +1,4 @@
-import { Resolver, Query, Mutation, Args } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args, ID } from '@nestjs/graphql';
 import { GamesService } from './games.service';
 import { Game } from './entities/game.entity';
 import { CreateGameInput } from './dto/create-game.input';
@@ -15,7 +15,9 @@ export class GamesResolver {
   }
 
   @Query(() => Game, { name: 'findGameById' })
-  findOne(@Args('id') id: string): Promise<Game> {
+  findOne(
+    @Args('id', { type: () => ID, description: 'ID of the game.' }) id: string,
+  ): Promise<Game> {
     return this.gamesService.findOneById(id);
   }
 }

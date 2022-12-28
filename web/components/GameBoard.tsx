@@ -25,27 +25,30 @@ export const GameBoard = ({ game, loading }: GameProps) => {
   const gameEnded = wonState || (!wonState && currentRound === board.numRows);
   const router = useRouter();
 
+  console.log(game);
+
   // router.push({
   //   pathname: `/game/${game.id}`,
   //   query: {
   //     gameboard: board.id,
   //   },
   // });
+  // game.persistGameData();
+  // board.persistGameData();
 
-  useEffect(() => {
-    // console.log("Router:", router.query.gameboard);
-    if (!router.query.gameboard && !loading) {
-      router.push({
-        pathname: `/game/${game.id}`,
-        query: {
-          gameboard: board.id,
-        },
-      });
-      console.log("persist:", game);
-      game.persistGameData();
-      // board.persistGameData();
-    }
-  }, [loading]);
+  // useEffect(() => {
+  //   // console.log("Router:", router.query.gameboard);
+  //   if (!router.query.gameboard && !loading) {
+  //     router.push({
+  //       pathname: `/game/${game.id}`,
+  //       query: {
+  //         gameboard: board.id,
+  //       },
+  //     });
+  //     game.persistGameData();
+  //     // board.persistGameData();
+  //   }
+  // }, [loading]);
 
   // useEffect(() => {
   //   setTimeout(() => {

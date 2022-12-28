@@ -15,7 +15,7 @@ export class Game {
 
   @Field({ description: 'code for the game.' })
   @Column({ name: 'code' })
-  code!: number;
+  code!: string;
 
   @Field({ description: 'Creation timestamp of the game.' })
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })

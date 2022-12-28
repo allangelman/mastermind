@@ -1,36 +1,24 @@
 import { GetServerSideProps } from "next";
 import Head from "next/head";
-import { useRouter } from "next/router";
-import { useCallback, useEffect, useState } from "react";
-
+import { GraphQLClient, gql } from "graphql-request";
 import { GameBoard } from "../../components/GameBoard";
 import { Header } from "../../components/Header";
 import { Options } from "../../components/Options";
-import { GameBoardModel } from "../../models/GameBoardModel";
 import { GameModel } from "../../models/GameModel";
 import { OptionsModel } from "../../models/OptionsModel";
 
 type GamePageProps = {
-  id: string;
+  integers: number[];
+  game_id: string;
+  board_id: string;
 };
 
-export default function GamePage({ id }: GamePageProps) {
-  const [code, setCode] = useState<number[]>();
-
-  useEffect(() => {
-    console.log("USEEFFECT");
-    async function fetchData() {
-      const response = await fetch(
-        "https://www.random.org/integers/?num=4&min=0&max=7&col=1&base=10&format=plain&rnd=new"
-      );
-      const text = await response.text();
-      const integers = text.split("\n").map((intString) => parseInt(intString));
-      integers.pop();
-      setCode(integers);
-    }
-
-    fetchData();
-  }, [setCode]);
+export default function GamePage({
+  integers,
+  game_id,
+  board_id,
+}: GamePageProps) {
+  console.log("INTEGEGS", integers);
 
   const options = new OptionsModel(8);
 
@@ -44,15 +32,11 @@ export default function GamePage({ id }: GamePageProps) {
       </Head>
       <Header />
       <div className="mx-auto w-[500px] space-y-2">
-        <div className="flex justify-center">{code ? code : "Loading..."}</div>
-        {code ? (
-          <GameBoard game={new GameModel(4, 10, options, code, id)} />
-        ) : (
-          <GameBoard
-            game={new GameModel(4, 10, options, [-1, -1, -1, -1], id)}
-            loading
-          />
-        )}
+        <div className="flex justify-center">{integers}</div>
+
+        <GameBoard
+          game={new GameModel(4, 10, options, integers, game_id, board_id)}
+        />
         <Options options={options} />
       </div>
     </>
@@ -62,8 +46,31 @@ export default function GamePage({ id }: GamePageProps) {
 export const getServerSideProps: GetServerSideProps<
   GamePageProps,
   { id: string }
-> = async ({ params }) => {
-  const id = params?.id ?? "";
+> = async ({ params, query }) => {
+  const endpoint = " https://mastermind-api.onrender.com/graphql";
 
-  return { props: { id } };
+  const graphQLClient = new GraphQLClient(endpoint);
+
+  const queryy = gql`
+    query findGameById($id: String!) {
+      findGameById(id: $id) {
+        code
+        id
+      }
+    }
+  `;
+
+  const variables = {
+    id: params?.id ?? "",
+  };
+
+  const data = await graphQLClient.request(queryy, variables);
+
+  return {
+    props: {
+      integers: data.findGameById.code,
+      game_id: params?.id ?? "",
+      board_id: typeof query?.gameboard === "string" ? query?.gameboard : "",
+    },
+  };
 };

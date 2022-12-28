@@ -1,14 +1,23 @@
+import { GraphQLClient, gql } from "graphql-request";
+import { GetServerSideProps } from "next";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 
 import { v4 as uuidv4 } from "uuid";
+import { GameModel } from "../models/GameModel";
+import { OptionsModel } from "../models/OptionsModel";
 
-export default function Home() {
+type GamePageProps = {
+  game_id: string;
+  board_id: string;
+};
+
+export default function Home({ game_id, board_id }: GamePageProps) {
   const router = useRouter();
 
   useEffect(() => {
-    router.push(`/game/${uuidv4()}`);
+    router.push(`/game/${game_id}?gameboard=${board_id}`);
   }, [router]);
 
   return (
@@ -22,3 +31,53 @@ export default function Home() {
     </>
   );
 }
+
+export const getServerSideProps: GetServerSideProps<
+  GamePageProps
+> = async () => {
+  const response = await fetch(
+    "https://www.random.org/integers/?num=4&min=0&max=7&col=1&base=10&format=plain&rnd=new"
+  );
+  const code = await response.text();
+  const integers = code.split("\n").map((intString) => parseInt(intString));
+  integers.pop();
+
+  const endpoint = " https://mastermind-api.onrender.com/graphql";
+
+  const graphQLClient = new GraphQLClient(endpoint);
+
+  const mutation = gql`
+    mutation createGame($createGameInput: CreateGameInput!) {
+      createGame(createGameInput: $createGameInput) {
+        code
+        id
+      }
+    }
+  `;
+  const oneNumberCode = parseFloat(integers.join(""));
+
+  const variables = {
+    createGameInput: { code: oneNumberCode },
+  };
+
+  const data = await graphQLClient.request(mutation, variables);
+
+  const mutation2 = gql`
+    mutation createGameBoard($createGameBoardInput: CreateGameBoardInput!) {
+      createGameBoard(createGameBoardInput: $createGameBoardInput) {
+        id
+      }
+    }
+  `;
+
+  const variables2 = {
+    createGameBoardInput: { game_id: data.createGame.id },
+  };
+
+  const data2 = await graphQLClient.request(mutation2, variables2);
+  console.log("DATAA2222: ", data2);
+
+  return {
+    props: { game_id: data.createGame.id, board_id: data2.createGameBoard.id },
+  };
+};

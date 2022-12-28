@@ -16,7 +16,8 @@ export class GameModel {
     numRows: number,
     options: OptionsModel,
     code: number[],
-    id: string
+    id: string,
+    gameboardId: string
   ) {
     this.numSlots = numSlots;
     this.id = id;
@@ -25,7 +26,7 @@ export class GameModel {
     this.code = code;
 
     this.gameBoards.push(
-      new GameBoardModel(numSlots, numRows, options, code, this.id, uuidv4())
+      new GameBoardModel(numSlots, numRows, options, code, this.id, gameboardId)
     );
   }
 

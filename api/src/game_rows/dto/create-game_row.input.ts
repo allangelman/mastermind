@@ -12,8 +12,8 @@ export class CreateGameRowInput {
   row_num: number;
 
   @Field({ description: 'values of the game row.' })
-  values: number;
+  values: string;
 
   @Field({ description: 'feedback of the game row.' })
-  feedback: number;
+  feedback: string;
 }
