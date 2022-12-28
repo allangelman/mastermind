@@ -74,7 +74,6 @@ export const getServerSideProps: GetServerSideProps<
   };
 
   const data2 = await graphQLClient.request(mutation2, variables2);
-  // console.log("DATAA2222: ", data2);
 
   return {
     props: { game_id: data.createGame.id, board_id: data2.createGameBoard.id },

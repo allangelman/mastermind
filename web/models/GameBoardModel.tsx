@@ -2,6 +2,7 @@ import { GameBoardRowModel } from "./GameBoardRowModel";
 import { OptionsModel } from "./OptionsModel";
 import { PlayerModel } from "./PlayerModel";
 import { GraphQLClient, gql } from "graphql-request";
+import { FeedbackModel } from "./FeedbackModel";
 
 export class GameBoardModel {
   private readonly options: OptionsModel;
@@ -11,8 +12,10 @@ export class GameBoardModel {
   id: string;
   isWon: boolean = false;
   numRows: number;
+  code: number[];
   gameId: string;
   players: PlayerModel[] = [];
+  existingRows: GameBoardRowModel[];
 
   constructor(
     numSlots: number,
@@ -20,17 +23,25 @@ export class GameBoardModel {
     options: OptionsModel,
     code: number[],
     gameId: string,
-    id: string
+    id: string,
+    existingRows: GameBoardRowModel[]
   ) {
     this.numSlots = numSlots;
     this.id = id;
+    this.code = code;
     this.gameId = gameId;
     this.numRows = numRows;
     this.options = options;
-    this.currentRound = 0;
+    this.currentRound = existingRows.length;
     this.gameBoard = [];
+    this.existingRows = existingRows;
 
-    for (let i = 0; i < numRows; i++) {
+    for (let i = 0; i < existingRows.length; i++) {
+      const row = existingRows[i];
+      this.gameBoard.push(row);
+    }
+
+    for (let i = existingRows.length; i < numRows; i++) {
       const row = new GameBoardRowModel(this.numSlots, code, i, this.id);
       this.gameBoard.push(row);
     }
@@ -44,7 +55,7 @@ export class GameBoardModel {
     const queryy = gql`
       query findGameBoardById($id: ID!) {
         findGameBoardById(id: $id) {
-          row {
+          rows {
             row_num
             values
             feedback
@@ -59,7 +70,31 @@ export class GameBoardModel {
     };
 
     const data = await graphQLClient.request(queryy, variables);
-    console.log(data);
+    const rowsData = data.findGameBoardById.rows;
+    for (let i = 0; i < this.numRows; i++) {
+      if (i < rowsData.length) {
+        const rowData = rowsData[i];
+        const values = rowData.values
+          .split("")
+          .map((char: string) => parseInt(char));
+        const feedback = rowData.feedback
+          .split("")
+          .map((char: string) => parseInt(char));
+        const feedbackModel = new FeedbackModel(this.code, feedback);
+        const row = new GameBoardRowModel(
+          this.numSlots,
+          this.code,
+          i,
+          this.id,
+          values,
+          feedbackModel
+        );
+        this.gameBoard[i] = row;
+      } else {
+        const row = new GameBoardRowModel(this.numSlots, this.code, i, this.id);
+        this.gameBoard[i] = row;
+      }
+    }
   }
 
   incrementRound(): void {

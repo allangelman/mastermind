@@ -12,13 +12,23 @@ export class GameBoardRowModel {
     numSlots: number,
     code: number[],
     rowNumber: number,
-    gameBoardId: string
+    gameBoardId: string,
+    values?: number[],
+    feedback?: FeedbackModel
   ) {
     this.gameBoardId = gameBoardId;
     this.code = code;
     this.rowNumber = rowNumber;
-    for (let i = 0; i < numSlots; i++) {
-      this.values.push(-1);
+
+    if (feedback) {
+      this.feedbackModel = feedback;
+    }
+    if (values) {
+      this.values = values;
+    } else {
+      for (let i = 0; i < numSlots; i++) {
+        this.values.push(-1);
+      }
     }
   }
 
@@ -49,7 +59,6 @@ export class GameBoardRowModel {
     };
 
     const data = await graphQLClient.request(mutation, variables);
-    console.log("ROWDATA: ", data);
   }
 
   setFeedback(guesses: number[]): void {

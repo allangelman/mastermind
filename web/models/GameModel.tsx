@@ -1,7 +1,6 @@
 import { OptionsModel } from "./OptionsModel";
 import { GameBoardModel } from "./GameBoardModel";
 import { v4 as uuidv4 } from "uuid";
-import { GraphQLClient, gql } from "graphql-request";
 
 export class GameModel {
   readonly numSlots: number;
@@ -26,7 +25,15 @@ export class GameModel {
     this.code = code;
 
     this.gameBoards.push(
-      new GameBoardModel(numSlots, numRows, options, code, this.id, gameboardId)
+      new GameBoardModel(
+        numSlots,
+        numRows,
+        options,
+        code,
+        this.id,
+        gameboardId,
+        []
+      )
     );
   }
 
@@ -38,7 +45,8 @@ export class GameModel {
         this.options,
         this.code,
         this.id,
-        uuidv4()
+        uuidv4(),
+        []
       )
     );
   }
