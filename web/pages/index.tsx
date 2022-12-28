@@ -1,12 +1,17 @@
-import { GraphQLClient, gql } from "graphql-request";
 import { GetServerSideProps } from "next";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
-import { v4 as uuidv4 } from "uuid";
-import { GameModel } from "../models/GameModel";
-import { OptionsModel } from "../models/OptionsModel";
+import {
+  createBoardData,
+  createBoardVariables,
+  createGameData,
+  createGameVariables,
+  CREATE_GAME,
+  CREATE_GAME_BOARD,
+  GQLClient,
+} from "../lib/graphQLClient";
 
 type GamePageProps = {
   game_id: string;
@@ -42,40 +47,24 @@ export const getServerSideProps: GetServerSideProps<
   const codeArray = codeWithNewLines.split("\n");
   const code = codeArray.join("");
 
-  const endpoint = " https://mastermind-api.onrender.com/graphql";
+  const gql = new GQLClient();
 
-  const graphQLClient = new GraphQLClient(endpoint);
+  const gameData = await gql.request<createGameData, createGameVariables>(
+    CREATE_GAME,
+    { createGameInput: { code } }
+  );
 
-  const mutation = gql`
-    mutation createGame($createGameInput: CreateGameInput!) {
-      createGame(createGameInput: $createGameInput) {
-        code
-        id
-      }
+  const boardData = await gql.request<createBoardData, createBoardVariables>(
+    CREATE_GAME_BOARD,
+    {
+      createGameBoardInput: { game_id: gameData.createGame.id },
     }
-  `;
-
-  const variables = {
-    createGameInput: { code },
-  };
-
-  const data = await graphQLClient.request(mutation, variables);
-
-  const mutation2 = gql`
-    mutation createGameBoard($createGameBoardInput: CreateGameBoardInput!) {
-      createGameBoard(createGameBoardInput: $createGameBoardInput) {
-        id
-      }
-    }
-  `;
-
-  const variables2 = {
-    createGameBoardInput: { game_id: data.createGame.id },
-  };
-
-  const data2 = await graphQLClient.request(mutation2, variables2);
+  );
 
   return {
-    props: { game_id: data.createGame.id, board_id: data2.createGameBoard.id },
+    props: {
+      game_id: gameData.createGame.id,
+      board_id: boardData.createGameBoard.id,
+    },
   };
 };

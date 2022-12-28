@@ -1,6 +1,3 @@
-import { Options } from "next/dist/server/base-server";
-import { OptionsModel } from "./OptionsModel";
-
 export class FeedbackModel {
   feedback: number[];
   code: number[];

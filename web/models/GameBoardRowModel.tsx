@@ -1,5 +1,10 @@
 import { FeedbackModel } from "./FeedbackModel";
-import { GraphQLClient, gql } from "graphql-request";
+import {
+  createRowData,
+  createRowVariables,
+  CREATE_ROW,
+  GQLClient,
+} from "../lib/graphQLClient";
 
 export class GameBoardRowModel {
   rowNumber: number;
@@ -33,32 +38,16 @@ export class GameBoardRowModel {
   }
 
   async saveRow(): Promise<void> {
-    const endpoint = " https://mastermind-api.onrender.com/graphql";
+    const gql = new GQLClient();
 
-    const graphQLClient = new GraphQLClient(endpoint);
-
-    const mutation = gql`
-      mutation createGameRow($createGameRowInput: CreateGameRowInput!) {
-        createGameRow(createGameRowInput: $createGameRowInput) {
-          row_num
-          game_board_id
-          values
-          feedback
-          id
-        }
-      }
-    `;
-
-    const variables = {
+    await gql.request<createRowData, createRowVariables>(CREATE_ROW, {
       createGameRowInput: {
         game_board_id: this.gameBoardId,
         row_num: this.rowNumber,
         values: this.values.join(""),
         feedback: this.feedback.join(""),
       },
-    };
-
-    const data = await graphQLClient.request(mutation, variables);
+    });
   }
 
   setFeedback(guesses: number[]): void {
