@@ -34,15 +34,18 @@ export const GameBoard = ({ game, loading }: GameProps) => {
 
   useEffect(() => {
     // console.log("Router:", router.query.gameboard);
-    // if (!router.query.gameboard) {
-    router.push({
-      pathname: `/game/${game.id}`,
-      query: {
-        gameboard: board.id,
-      },
-    });
-    // }
-  }, []);
+    if (!router.query.gameboard && !loading) {
+      router.push({
+        pathname: `/game/${game.id}`,
+        query: {
+          gameboard: board.id,
+        },
+      });
+      console.log("persist:", game);
+      game.persistGameData();
+      // board.persistGameData();
+    }
+  }, [loading]);
 
   // useEffect(() => {
   //   setTimeout(() => {

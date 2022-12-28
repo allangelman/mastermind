@@ -1,0 +1,2 @@
+ALTER TABLE game_boards
+ALTER COLUMN player_id DROP NOT NULL;

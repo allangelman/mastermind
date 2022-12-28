@@ -1,7 +1,8 @@
 import { InputType, Field } from '@nestjs/graphql';
 
 @InputType({
-  description: 'Provides the fields and values to use when creating a game.',
+  description:
+    'Provides the fields and values to use when creating a game board.',
 })
 export class CreateGameBoardInput {
   @Field({ description: 'game_id' })

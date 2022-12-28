@@ -25,33 +25,36 @@ export class GameModel {
     this.code = code;
 
     this.gameBoards.push(
-      new GameBoardModel(numSlots, numRows, options, code, uuidv4())
+      new GameBoardModel(numSlots, numRows, options, code, this.id, uuidv4())
     );
   }
 
-  // async persistGameData(code: string): Promise<void> {
-  //   const endpoint = " https://mastermind-api.onrender.com/graphql";
+  async persistGameData(): Promise<void> {
+    const endpoint = " https://mastermind-api.onrender.com/graphql";
 
-  //   const graphQLClient = new GraphQLClient(endpoint);
+    const graphQLClient = new GraphQLClient(endpoint);
 
-  //   const mutation = gql`
-  //     mutation createPlayer($createPlayerInput: CreatePlayerInput!) {
-  //       createPlayer(createPlayerInput: $createPlayerInput) {
-  //         name
-  //       }
-  //     }
-  //   `;
+    const mutation = gql`
+      mutation createGame($createGameInput: CreateGameInput!) {
+        createGame(createGameInput: $createGameInput) {
+          code
+        }
+      }
+    `;
+    const code = parseFloat(this.code.join(""));
 
-  //   const variables = {
-  //     createPlayerInput: { name },
-  //   };
+    console.log("CODE: ", code, this.code.join(""));
 
-  //   try {
-  //     const data = await graphQLClient.request(mutation, variables);
-  //   } catch (error) {
-  //     throw error;
-  //   }
-  // }
+    const variables = {
+      createGameInput: { code },
+    };
+
+    try {
+      const data = await graphQLClient.request(mutation, variables);
+    } catch (error) {
+      throw error;
+    }
+  }
 
   addGameBoard(): void {
     this.gameBoards.push(
@@ -60,6 +63,7 @@ export class GameModel {
         this.numRows,
         this.options,
         this.code,
+        this.id,
         uuidv4()
       )
     );

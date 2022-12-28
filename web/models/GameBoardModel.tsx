@@ -11,6 +11,7 @@ export class GameBoardModel {
   id: string;
   isWon: boolean = false;
   numRows: number;
+  gameId: string;
   players: PlayerModel[] = [];
 
   constructor(
@@ -18,10 +19,12 @@ export class GameBoardModel {
     numRows: number,
     options: OptionsModel,
     code: number[],
+    gameId: string,
     id: string
   ) {
     this.numSlots = numSlots;
     this.id = id;
+    this.gameId = gameId;
     this.numRows = numRows;
     this.options = options;
     this.currentRound = 0;
@@ -30,6 +33,30 @@ export class GameBoardModel {
     for (let i = 0; i < numRows; i++) {
       const row = new GameBoardRowModel(this.numSlots, code, i);
       this.gameBoard.push(row);
+    }
+  }
+
+  async persistGameData(): Promise<void> {
+    const endpoint = " https://mastermind-api.onrender.com/graphql";
+
+    const graphQLClient = new GraphQLClient(endpoint);
+
+    const mutation = gql`
+      mutation createGameBoard($createGameBoardInput: CreateGameBoardInput!) {
+        createGameBoard(createGameBoardInput: $createGameBoardInput) {
+          game_id
+        }
+      }
+    `;
+
+    const variables = {
+      createGameBoardInput: { game_id: this.gameId },
+    };
+
+    try {
+      const data = await graphQLClient.request(mutation, variables);
+    } catch (error) {
+      throw error;
     }
   }
 

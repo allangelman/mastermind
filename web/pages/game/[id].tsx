@@ -1,7 +1,7 @@
 import { GetServerSideProps } from "next";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import { GameBoard } from "../../components/GameBoard";
 import { Header } from "../../components/Header";
@@ -18,6 +18,7 @@ export default function GamePage({ id }: GamePageProps) {
   const [code, setCode] = useState<number[]>();
 
   useEffect(() => {
+    console.log("USEEFFECT");
     async function fetchData() {
       const response = await fetch(
         "https://www.random.org/integers/?num=4&min=0&max=7&col=1&base=10&format=plain&rnd=new"
@@ -29,7 +30,7 @@ export default function GamePage({ id }: GamePageProps) {
     }
 
     fetchData();
-  }, []);
+  }, [setCode]);
 
   const options = new OptionsModel(8);
 

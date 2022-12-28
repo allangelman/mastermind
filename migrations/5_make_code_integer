@@ -1,0 +1,5 @@
+ALTER TABLE games
+DROP COLUMN code;
+
+ALTER TABLE games
+ADD COLUMN code integer NOT NULL;
