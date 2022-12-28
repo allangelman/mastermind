@@ -27,6 +27,14 @@ export class GameBoardsResolver {
     return this.gameBoardsService.create(createGameBoardInput);
   }
 
+  @Mutation(() => GameBoard)
+  updateGameResult(
+    @Args('id', { type: () => ID, description: 'ID of the board.' }) id: string,
+    @Args('result') result: string,
+  ): Promise<GameBoard> {
+    return this.gameBoardsService.updateResult(id, result);
+  }
+
   @Query(() => GameBoard, { name: 'findGameBoardById' })
   findOne(
     @Args('id', { type: () => ID, description: 'ID of the board.' }) id: string,

@@ -27,6 +27,11 @@ export class GameBoardsService {
     return this.gameBoardsRepository.findOneBy({ id });
   }
 
+  async updateResult(id: string, result: string): Promise<GameBoard> {
+    await this.gameBoardsRepository.update({ id }, { result: result });
+    return this.gameBoardsRepository.findOneBy({ id });
+  }
+
   // remove(id: number) {
   //   return `This action removes a #${id} game`;
   // }
