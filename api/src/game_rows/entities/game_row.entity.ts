@@ -23,7 +23,7 @@ export class GameRow {
 
   @Field({ description: 'feedback.' })
   @Column({ name: 'feedback' })
-  feedback: string;
+  feedback!: string;
 
   @Field({ description: 'values.' })
   @Column({ name: 'values' })
