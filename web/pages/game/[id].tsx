@@ -17,6 +17,9 @@ import {
   GET_GAME,
   GQLClient,
 } from "../../lib/graphQLClient";
+import { useEffect, useState } from "react";
+import io from "Socket.IO-client";
+let socket: any;
 
 type GamePageProps = {
   code: string;
@@ -34,6 +37,24 @@ export default function GamePage({
   result,
 }: GamePageProps) {
   const options = new OptionsModel(8);
+
+  const [input, setInput] = useState("");
+
+  useEffect(() => {
+    socketInitializer();
+  }, []);
+
+  const socketInitializer = async () => {
+    await fetch("/api/socket");
+    socket = io();
+    socket.on("connect", () => {
+      console.log("connected");
+    });
+
+    socket.on("update-input", (msg: any) => {
+      setInput(msg);
+    });
+  };
 
   const existingRowsReady = [];
   for (let i = 0; i < existingRows.length; i++) {
@@ -70,6 +91,14 @@ export default function GamePage({
       <Header />
       <div className="mx-auto w-[500px] space-y-2">
         <div className="flex justify-center">{code}</div>
+        <input
+          placeholder="Type something"
+          value={input}
+          onChange={(e) => {
+            setInput(e.target.value);
+            socket.emit("input-change", e.target.value);
+          }}
+        />
         <GameBoard
           board={
             new GameBoardModel(
