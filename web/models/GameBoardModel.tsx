@@ -2,6 +2,14 @@ import { GameBoardRowModel } from "./GameBoardRowModel";
 import { OptionsModel } from "./OptionsModel";
 import { PlayerModel } from "./PlayerModel";
 import { GraphQLClient, gql } from "graphql-request";
+import {
+  GQLClient,
+  updateBoardResultData,
+  updateBoardResultVariables,
+  UPDATE_GAME_RESULT,
+} from "../lib/graphQLClient";
+
+export type GameResult = "Won" | "Lost";
 
 export class GameBoardModel {
   private readonly options: OptionsModel;
@@ -9,7 +17,7 @@ export class GameBoardModel {
   currentRound: number;
   gameBoard: GameBoardRowModel[];
   id: string;
-  isWon: boolean = false;
+  gameResult?: GameResult;
   numRows: number;
   code: number[];
   gameId: string;
@@ -23,7 +31,8 @@ export class GameBoardModel {
     code: number[],
     gameId: string,
     id: string,
-    existingRows: GameBoardRowModel[]
+    existingRows: GameBoardRowModel[],
+    gameResult?: GameResult
   ) {
     this.numSlots = numSlots;
     this.id = id;
@@ -31,9 +40,12 @@ export class GameBoardModel {
     this.gameId = gameId;
     this.numRows = numRows;
     this.options = options;
-    this.currentRound = existingRows.length;
+    this.currentRound = gameResult
+      ? existingRows.length - 1
+      : existingRows.length;
     this.gameBoard = [];
     this.existingRows = existingRows;
+    this.gameResult = gameResult;
 
     for (let i = 0; i < existingRows.length; i++) {
       const row = existingRows[i];
@@ -47,21 +59,44 @@ export class GameBoardModel {
   }
 
   incrementRound(): void {
-    this.currentRound += 1;
+    if (!this.gameResult) this.currentRound += 1;
   }
 
   getCurrentOption(): number {
     return this.options.getCurrentOption();
   }
 
-  checkWonState(rowNumber: number): boolean {
+  checkGameResult(rowNumber: number): GameResult | undefined {
     const rowFeedback = this.gameBoard[rowNumber].feedback;
     const wonState = [2, 2, 2, 2];
-    return rowFeedback.every((val, index) => val === wonState[index]);
+    const state = rowFeedback.every((val, index) => val === wonState[index]);
+    if (state === true) {
+      this.gameResult = "Won";
+      this.updateResult("Won");
+      return "Won";
+    } else if (state === false && this.currentRound === this.numRows - 1) {
+      this.gameResult = "Lost";
+      this.updateResult("Lost");
+      return "Lost";
+    }
   }
 
   addPlayer(player: PlayerModel): void {
     this.players.push(player);
+  }
+
+  async updateResult(result: string): Promise<void> {
+    const gql = new GQLClient();
+
+    await gql.request<updateBoardResultData, updateBoardResultVariables>(
+      UPDATE_GAME_RESULT,
+      {
+        updateGameBoardInput: {
+          id: this.id,
+          result: result,
+        },
+      }
+    );
   }
 
   async checkNameAvailablity(name: string): Promise<boolean> {

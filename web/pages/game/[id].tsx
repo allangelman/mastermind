@@ -1,15 +1,16 @@
 import { GetServerSideProps } from "next";
 import Head from "next/head";
-import { GraphQLClient, gql } from "graphql-request";
 import { GameBoard } from "../../components/GameBoard";
 import { Header } from "../../components/Header";
 import { Options } from "../../components/Options";
 import { OptionsModel } from "../../models/OptionsModel";
 import { FeedbackModel } from "../../models/FeedbackModel";
 import { GameBoardRowModel } from "../../models/GameBoardRowModel";
-import { GameBoardModel } from "../../models/GameBoardModel";
+import { GameBoardModel, GameResult } from "../../models/GameBoardModel";
 import {
   existingRowData,
+  getBoardData,
+  getBoardVariables,
   getGameData,
   getGameVariables,
   GET_BOARD,
@@ -22,6 +23,7 @@ type GamePageProps = {
   game_id: string;
   board_id: string;
   existingRows: existingRowData[];
+  result?: GameResult;
 };
 
 export default function GamePage({
@@ -29,6 +31,7 @@ export default function GamePage({
   game_id,
   board_id,
   existingRows,
+  result,
 }: GamePageProps) {
   const options = new OptionsModel(8);
 
@@ -76,7 +79,8 @@ export default function GamePage({
               code.split("").map((char) => parseInt(char)),
               game_id,
               board_id,
-              existingRowsReady
+              existingRowsReady,
+              result ? result : undefined
             )
           }
         />
@@ -96,22 +100,13 @@ export const getServerSideProps: GetServerSideProps<
     id: params?.id ?? "",
   });
 
-  interface getBoardData {
-    findGameBoardById: {
-      rows: existingRowData[];
-    };
-  }
-
-  interface getBoardVariables {
-    id: string;
-  }
-
   const boardData = await gql.request<getBoardData, getBoardVariables>(
     GET_BOARD,
     {
       id: typeof query?.boardId === "string" ? query?.boardId : "",
     }
   );
+  console.log(boardData);
 
   return {
     props: {
@@ -119,6 +114,7 @@ export const getServerSideProps: GetServerSideProps<
       game_id: params?.id ?? "",
       board_id: typeof query?.boardId === "string" ? query?.boardId : "",
       existingRows: boardData?.findGameBoardById.rows,
+      result: boardData?.findGameBoardById.result,
     },
   };
 };

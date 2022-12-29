@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { GameBoardModel } from "../models/GameBoardModel";
+import { GameBoardModel, GameResult } from "../models/GameBoardModel";
 import cn from "classnames";
 import { GameBoardRowModel } from "../models/GameBoardRowModel";
 import * as Dialog from "@radix-ui/react-dialog";
@@ -11,9 +11,11 @@ interface GameProps {
 
 export const GameBoard = ({ board }: GameProps) => {
   const [currentRound, setCurrentRound] = useState<number>(board.currentRound);
-  const [wonState, setWonState] = useState<boolean>(false);
+  const [gameResult, setGameResult] = useState<GameResult | undefined>(
+    board.gameResult
+  );
 
-  const gameEnded = wonState || (!wonState && currentRound === board.numRows);
+  const gameEnded = gameResult !== undefined;
   const router = useRouter();
 
   return (
@@ -29,34 +31,26 @@ export const GameBoard = ({ board }: GameProps) => {
                 board={board}
                 currentRound={currentRound}
                 setCurrentRound={setCurrentRound}
-                setWonState={setWonState}
+                setGameResult={setGameResult}
               />
             ))}
           </>
         </div>
+        {gameEnded && (
+          <div className="flex flex-col items-center">
+            <div>{gameResult === "Won" ? "WON!" : "LOST :("}</div>
+            <div>code: {board.code}</div>
+            <button
+              onClick={() => {
+                router.push(`/`);
+              }}
+              className="w-40 h-10 flex justify-center items-center bg-green-200 hover:bg-green-300 rounded-lg"
+            >
+              Play Another Game
+            </button>
+          </div>
+        )}
       </div>
-
-      <Dialog.Root open={gameEnded} onOpenChange={() => {}}>
-        <Dialog.Portal>
-          <Dialog.Overlay className="fixed inset-0" />
-          <Dialog.Content className="w-[200px] h-[100px] flex flex-col justify-center space-y-2 items-center bg-slate-300 fixed top-[40%] outline-none rounded-lg left-[40%]">
-            <Dialog.Title className="flex justify-center">
-              {wonState ? "WON!" : "LOST :("}
-            </Dialog.Title>
-            <Dialog.Close asChild>
-              <button
-                onClick={() => {
-                  setWonState(false);
-                  router.push(`/`);
-                }}
-                className="w-40 h-10 flex justify-center items-center bg-green-200 hover:bg-green-300 rounded-lg"
-              >
-                Play Another Game
-              </button>
-            </Dialog.Close>
-          </Dialog.Content>
-        </Dialog.Portal>
-      </Dialog.Root>
     </>
   );
 };
@@ -67,7 +61,7 @@ interface RowProps {
   rowModel: GameBoardRowModel;
   board: GameBoardModel;
   setCurrentRound: Dispatch<SetStateAction<number>>;
-  setWonState: Dispatch<SetStateAction<boolean>>;
+  setGameResult: Dispatch<SetStateAction<GameResult | undefined>>;
 }
 
 export const Row = ({
@@ -76,7 +70,7 @@ export const Row = ({
   currentRound,
   rowModel,
   setCurrentRound,
-  setWonState,
+  setGameResult,
 }: RowProps) => {
   const [feedback, setFeedback] = useState<number[]>(rowModel.feedback);
 
@@ -98,15 +92,17 @@ export const Row = ({
       <Feedback
         currentRound={currentRound}
         onClick={() => {
-          board.incrementRound();
-          setCurrentRound(board.currentRound);
           rowModel.setFeedback(rowModel.values);
           setFeedback(rowModel.feedback);
-          setWonState(board.checkWonState(rowModel.rowNumber));
+          setGameResult(board.checkGameResult(rowModel.rowNumber));
           rowModel.saveRow();
+
+          board.incrementRound();
+          setCurrentRound(board.currentRound);
         }}
         rowNumber={rowModel.rowNumber}
         feedback={feedback}
+        gameResult={board.gameResult}
       />
     </div>
   );
@@ -155,6 +151,7 @@ interface FeedbackProps {
   onClick: () => void;
   rowNumber: number;
   feedback: number[];
+  gameResult?: GameResult;
 }
 
 export const Feedback = ({
@@ -162,6 +159,7 @@ export const Feedback = ({
   onClick,
   rowNumber,
   feedback,
+  gameResult,
 }: FeedbackProps) => {
   const [populatedFeedback, setPopulatedFeedback] =
     useState<number[]>(feedback);
@@ -196,6 +194,7 @@ export const Feedback = ({
         rowNumber={rowNumber}
         currentRound={currentRound}
         onClick={onClick}
+        disabled={gameResult !== undefined}
       />
     </>
   );
@@ -205,18 +204,24 @@ interface CheckButtonProps {
   rowNumber: number;
   currentRound: number;
   onClick: () => void;
+  disabled: boolean;
 }
 
 const CheckButton = ({
   rowNumber,
   currentRound,
   onClick,
+  disabled,
 }: CheckButtonProps) => {
   return (
     <>
       {rowNumber === currentRound ? (
         <button
-          className="w-20 h-10 bg-red-500 rounded-lg"
+          disabled={disabled}
+          className={cn("w-20 h-10 rounded-lg", {
+            "bg-red-400 hover:bg-red-600": !disabled,
+            "bg-red-300": disabled,
+          })}
           onClick={() => {
             onClick();
           }}

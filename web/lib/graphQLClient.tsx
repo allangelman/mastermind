@@ -46,6 +46,7 @@ export interface getGameVariables {
 export const GET_BOARD = gql`
   query findGameBoardById($id: ID!) {
     findGameBoardById(id: $id) {
+      result
       rows {
         row_num
         values
@@ -63,6 +64,7 @@ export interface existingRowData {
 
 export interface getBoardData {
   findGameBoardById: {
+    result?: "Won" | "Lost";
     rows: existingRowData[];
   };
 }
@@ -142,5 +144,28 @@ export interface createRowVariables {
     row_num: number;
     values: string;
     feedback: string;
+  };
+}
+
+export const UPDATE_GAME_RESULT = gql`
+  mutation updateGameResult($updateGameBoardInput: UpdateGameBoardInput!) {
+    updateGameResult(updateGameBoardInput: $updateGameBoardInput) {
+      id
+      result
+    }
+  }
+`;
+
+export interface updateBoardResultData {
+  updateGameResult: {
+    result: string;
+    id: string;
+  };
+}
+
+export interface updateBoardResultVariables {
+  updateGameBoardInput: {
+    id: string;
+    result: string;
   };
 }
