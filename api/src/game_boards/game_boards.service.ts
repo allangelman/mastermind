@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { CreateGameBoardInput } from './dto/create-game_board.input';
 import { InjectRepository } from '@nestjs/typeorm';
 import { GameBoard } from './entities/game_board.entity';
-import { Repository } from 'typeorm';
+import { Not, Repository } from 'typeorm';
 
 @Injectable()
 export class GameBoardsService {
@@ -23,8 +23,18 @@ export class GameBoardsService {
   //   return `This action returns all games`;
   // }
 
+  //TODO:this should have return type
   findOneById(id: string) {
     return this.gameBoardsRepository.findOneBy({ id });
+  }
+
+  findBoardsByGameId(gameId: string, myBoardId: string): Promise<GameBoard[]> {
+    return this.gameBoardsRepository.find({
+      where: {
+        game_id: gameId,
+        id: Not(myBoardId),
+      },
+    });
   }
 
   async updateResult(id: string, result: string): Promise<GameBoard> {

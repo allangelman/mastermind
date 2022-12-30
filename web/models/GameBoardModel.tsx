@@ -7,9 +7,14 @@ import {
   updateBoardResultData,
   updateBoardResultVariables,
   UPDATE_GAME_RESULT,
+  getBoardData,
+  getBoardVariables,
+  GET_BOARD,
 } from "../lib/graphQLClient";
 
 export type GameResult = "Won" | "Lost";
+
+const POLL_DELAY = 3000;
 
 export class GameBoardModel {
   private readonly options: OptionsModel;
@@ -23,6 +28,7 @@ export class GameBoardModel {
   gameId: string;
   players: PlayerModel[] = [];
   existingRows: GameBoardRowModel[];
+  gql: GQLClient;
 
   constructor(
     numSlots: number,
@@ -47,6 +53,8 @@ export class GameBoardModel {
     this.existingRows = existingRows;
     this.gameResult = gameResult;
 
+    this.gql = new GQLClient();
+
     for (let i = 0; i < existingRows.length; i++) {
       const row = existingRows[i];
       this.gameBoard.push(row);
@@ -56,6 +64,25 @@ export class GameBoardModel {
       const row = new GameBoardRowModel(this.numSlots, code, i, this.id);
       this.gameBoard.push(row);
     }
+  }
+
+  async poll(): Promise<void> {
+    return new Promise<void>((resolve) => {
+      const initialStatus = this.uploadStatus;
+      const updateFileStatus = async (): Promise<void> => {
+        const status = await this.fileService.uploadStatus(this.id);
+        this.setStatus(status);
+        if (status === "active") setTimeout(updateFileStatus, POLL_DELAY);
+        else {
+          if (status === "completed") this.store.addProcessedFiles(this.id);
+          if (status === "failed" && initialStatus === "active")
+            this.store.addFailedFiles(this.id);
+          resolve();
+        }
+      };
+
+      updateFileStatus();
+    });
   }
 
   incrementRound(): void {
@@ -97,6 +124,15 @@ export class GameBoardModel {
         },
       }
     );
+  }
+
+  async getOtherBoardFeedback(boardId: string): Promise<void> {
+    const getBoardData = await this.gql.request<
+      getBoardData,
+      getBoardVariables
+    >(GET_BOARD, {
+      id: boardId,
+    });
   }
 
   async checkNameAvailablity(name: string): Promise<boolean> {

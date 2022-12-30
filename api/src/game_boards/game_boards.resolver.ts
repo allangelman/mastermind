@@ -45,6 +45,16 @@ export class GameBoardsResolver {
     return this.gameBoardsService.findOneById(id);
   }
 
+  @Query(() => [GameBoard], { name: 'findOtherPlayerGameBoards' })
+  findOtherPlayerGameBoards(
+    @Args('gameId', { type: () => ID, description: 'ID of the game.' })
+    gameId: string,
+    @Args('myBoardId', { type: () => ID, description: 'ID of the my board.' })
+    myBoardId: string,
+  ): Promise<GameBoard[]> {
+    return this.gameBoardsService.findBoardsByGameId(gameId, myBoardId);
+  }
+
   @ResolveField(() => [GameRow], {
     description: 'All workspaces a user belongs to.',
   })

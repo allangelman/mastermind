@@ -8,6 +8,9 @@ import { FeedbackModel } from "../../models/FeedbackModel";
 import { GameBoardRowModel } from "../../models/GameBoardRowModel";
 import { GameBoardModel, GameResult } from "../../models/GameBoardModel";
 import {
+  createBoardData,
+  createBoardVariables,
+  CREATE_GAME_BOARD,
   existingRowData,
   getBoardData,
   getBoardVariables,
@@ -17,16 +20,16 @@ import {
   GET_GAME,
   GQLClient,
 } from "../../lib/graphQLClient";
-import { useEffect, useState } from "react";
-import io from "socket.io-client";
-let socket: any;
+import { useRouter } from "next/router";
+import { useEffect } from "react";
 
 type GamePageProps = {
   code: string;
   game_id: string;
   board_id: string;
   existingRows: existingRowData[];
-  result?: GameResult;
+  result?: GameResult | null;
+  newBoard: boolean;
 };
 
 export default function GamePage({
@@ -35,26 +38,16 @@ export default function GamePage({
   board_id,
   existingRows,
   result,
+  newBoard,
 }: GamePageProps) {
   const options = new OptionsModel(8);
-
-  const [input, setInput] = useState("");
+  const router = useRouter();
 
   useEffect(() => {
-    socketInitializer();
-  }, []);
-
-  const socketInitializer = async () => {
-    await fetch("/api/socket");
-    socket = io();
-    socket.on("connect", () => {
-      console.log("connected");
-    });
-
-    socket.on("update-input", (msg: any) => {
-      setInput(msg);
-    });
-  };
+    if (newBoard) {
+      router.push(`/game/${game_id}?boardId=${board_id}`);
+    }
+  }, [router, newBoard]);
 
   const existingRowsReady = [];
   for (let i = 0; i < existingRows.length; i++) {
@@ -91,14 +84,11 @@ export default function GamePage({
       <Header />
       <div className="mx-auto w-[500px] space-y-2">
         <div className="flex justify-center">{code}</div>
-        <input
-          placeholder="Type something"
-          value={input}
-          onChange={(e) => {
-            setInput(e.target.value);
-            socket.emit("input-change", e.target.value);
-          }}
-        />
+        <div>To invite others, send this link:</div>
+        <div>
+          mastermind-olive.vercel.app/game/
+          {game_id}
+        </div>
         <GameBoard
           board={
             new GameBoardModel(
@@ -129,21 +119,47 @@ export const getServerSideProps: GetServerSideProps<
     id: params?.id ?? "",
   });
 
-  const boardData = await gql.request<getBoardData, getBoardVariables>(
-    GET_BOARD,
-    {
-      id: typeof query?.boardId === "string" ? query?.boardId : "",
-    }
-  );
-  console.log(boardData);
+  let getBoardData: getBoardData;
+  let createBoardData: createBoardData;
+  let boardId: string | undefined;
+  let existingRows: existingRowData[] = [];
+  let result: GameResult | null = null;
+  let newBoard: boolean = false;
+
+  if (typeof query?.boardId === "string" && query.boardId) {
+    boardId = query?.boardId;
+  }
+
+  if (!boardId) {
+    createBoardData = await gql.request<createBoardData, createBoardVariables>(
+      CREATE_GAME_BOARD,
+      {
+        createGameBoardInput: { game_id: params?.id ?? "" },
+      }
+    );
+    boardId = createBoardData.createGameBoard.id;
+    newBoard = true;
+  } else {
+    getBoardData = await gql.request<getBoardData, getBoardVariables>(
+      GET_BOARD,
+      {
+        id: boardId ? boardId : "",
+      }
+    );
+    existingRows = getBoardData?.findGameBoardById.rows;
+    result = getBoardData?.findGameBoardById.result
+      ? getBoardData?.findGameBoardById.result
+      : null;
+  }
 
   return {
     props: {
       code: gameData?.findGameById.code,
       game_id: params?.id ?? "",
-      board_id: typeof query?.boardId === "string" ? query?.boardId : "",
-      existingRows: boardData?.findGameBoardById.rows,
-      result: boardData?.findGameBoardById.result,
+      board_id: boardId ? boardId : "",
+      existingRows: existingRows,
+      result: result,
+      newBoard: newBoard,
     },
   };
 };
