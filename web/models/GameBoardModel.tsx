@@ -35,6 +35,7 @@ export class GameBoardModel {
   players: PlayerModel[] = [];
   existingRows: GameBoardRowModel[];
   otherBoardData?: OtherBoardModel;
+  multiPlayerStarted?: boolean;
   gql: GQLClient;
 
   constructor(
@@ -45,7 +46,8 @@ export class GameBoardModel {
     gameId: string,
     id: string,
     existingRows: GameBoardRowModel[],
-    gameResult?: GameResult
+    gameResult?: GameResult,
+    multiPlayerStarted?: boolean
   ) {
     this.numSlots = numSlots;
     this.id = id;
@@ -59,6 +61,7 @@ export class GameBoardModel {
     this.gameBoard = [];
     this.existingRows = existingRows;
     this.gameResult = gameResult;
+    this.multiPlayerStarted = multiPlayerStarted;
 
     this.gql = new GQLClient();
 
@@ -147,7 +150,7 @@ export class GameBoardModel {
       (data: otherBoardData) =>
         new OtherBoardModel(data.id, data.rows, data.result)
     );
-
+    console.log("heyyy: ", values);
     return values;
   }
 

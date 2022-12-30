@@ -6,6 +6,7 @@ import * as Dialog from "@radix-ui/react-dialog";
 import { useRouter } from "next/router";
 import { GET_OTHER_BOARDS_FEEDBACK } from "../lib/graphQLClient";
 import { OtherFeedbackModel } from "../models/OtherFeedbackModel";
+import { OtherBoardModel } from "../models/OtherBoardModel";
 
 interface GameProps {
   board: GameBoardModel;
@@ -18,39 +19,86 @@ export const GameBoard = ({ board }: GameProps) => {
   const [gameResult, setGameResult] = useState<GameResult | undefined>(
     board.gameResult
   );
-  const [otherFeedback, setOtherFeedback] = useState<OtherFeedbackModel[]>([]);
+  const [otherPlayerFeedback, setOtherPlayerFeedback] = useState<
+    OtherBoardModel[]
+  >([]);
+  const [alreadyStarted, setAlreadtStarted] = useState<boolean>();
+  // const board = await board.getOtherBoardFeedback();
+  // useEffect(() => {
+  //   console.log("useEffect, ", otherPlayerFeedback);
+
+  //   const pollOtherPlayerBoards = async (): Promise<void> => {
+  //     const otherPlayerBoards = await board.getOtherBoardFeedback();
+  //     // if (otherPlayerBoards.length < 1) return;
+  //     // const firstPlayerBoard = otherPlayerBoards[0];
+  //     // this.otherBoardData = boardONE;
+
+  //     setOtherPlayerFeedback(otherPlayerBoards);
+  //     setTimeout(pollOtherPlayerBoards, POLL_DELAY);
+  //     // if (!firstPlayerBoard.result)
+  //     //   setTimeout(pollOtherPlayerBoards, POLL_DELAY);
+  //     // else {
+  //     //   // resolve();
+  //     // }
+  //   };
+
+  //   pollOtherPlayerBoards();
+
+  //   // setOtherFeedback(board.otherBoardData?.rows ?? []);
+  // }, [board, setOtherPlayerFeedback, board.otherBoardData?.rows]);
 
   useEffect(() => {
-    console.log("useEffect");
-    // async function fetchData() {
-    //   await board.poll();
-    // }
-    // fetchData();
-    const pollBoard = async (): Promise<void> => {
-      const boardsddd = await board.getOtherBoardFeedback();
-
-      const boardONE = boardsddd[0];
-      // this.otherBoardData = boardONE;
-      console.log(boardONE);
-      setOtherFeedback(boardONE.rows ?? []);
-      console.log(boardONE.rows);
-      if (!boardONE.result) setTimeout(pollBoard, POLL_DELAY);
-      else {
-        // resolve();
+    const fetchData = async (): Promise<void> => {
+      const otherboards = await board.getOtherBoardFeedback();
+      console.log(otherboards);
+      if (otherboards.length > 0) {
+        pollOtherPlayerBoards();
+        setAlreadtStarted(true);
       }
     };
 
-    pollBoard();
+    fetchData();
+    // if (alreadyStarted) {
+    //   pollOtherPlayerBoards();
+    // }
+  }, []);
 
-    // setOtherFeedback(board.otherBoardData?.rows ?? []);
-  }, [board, setOtherFeedback, board.otherBoardData?.rows]);
+  const pollOtherPlayerBoards = async (): Promise<void> => {
+    const otherPlayerBoards = await board.getOtherBoardFeedback();
+    // if (otherPlayerBoards.length < 1) return;
+    // const firstPlayerBoard = otherPlayerBoards[0];
+    // this.otherBoardData = boardONE;
+
+    setOtherPlayerFeedback(otherPlayerBoards);
+    setTimeout(pollOtherPlayerBoards, POLL_DELAY);
+    // if (!firstPlayerBoard.result)
+    //   setTimeout(pollOtherPlayerBoards, POLL_DELAY);
+    // else {
+    //   // resolve();
+    // }
+  };
+
+  // pollOtherPlayerBoards();
 
   const gameEnded = gameResult !== undefined;
   const router = useRouter();
-  console.log("HELLOOO: ", otherFeedback);
+  // console.log("HELLOOO: ", otherPlayerFeedback);
   return (
     <>
       <div className=" mx-auto w-[500px] flex flex-row space-x-4">
+        <button
+          onClick={() => {
+            pollOtherPlayerBoards();
+            setAlreadtStarted(true);
+          }}
+          disabled={alreadyStarted}
+          className={cn("w-20 h-10", {
+            "bg-green-500": !alreadyStarted,
+            "bg-green-200": alreadyStarted,
+          })}
+        >
+          start
+        </button>
         <div className=" flex flex-col items-center w-[300px] space-y-4 bg-yellow-500">
           <div className="flex flex-col space-y-2">
             <>
@@ -82,20 +130,29 @@ export const GameBoard = ({ board }: GameProps) => {
             </div>
           )}
         </div>
-        <div className=" bg-blue-400 space-y-4">
-          {otherFeedback.map((otherFeedbackModel, i) => (
-            <div key={i} className="flex flex-col space-y-1 h-10">
-              <div className="flex flex-row space-x-1">
-                <FeedbackCircle number={otherFeedbackModel.feedback[0]} />
-                <FeedbackCircle number={otherFeedbackModel.feedback[1]} />
-              </div>
-              <div className="flex flex-row space-x-1">
-                <FeedbackCircle number={otherFeedbackModel.feedback[2]} />
-                <FeedbackCircle number={otherFeedbackModel.feedback[3]} />
-              </div>
+        {otherPlayerFeedback.map((otherPlayerFeedback, i) => (
+          <>
+            <div key={`id-${i}`}>{otherPlayerFeedback.id}</div>
+            <div key={`feedback-${i}`} className="bg-blue-400 space-y-4">
+              {otherPlayerFeedback.rows.map((otherPlayerFeedback, i) => (
+                // <div>{otherPlayerFeedback.id}</div>
+                <div
+                  key={`individual - ${i}`}
+                  className="flex flex-col space-y-1 h-10"
+                >
+                  <div className="flex flex-row space-x-1">
+                    <FeedbackCircle number={otherPlayerFeedback.feedback[0]} />
+                    <FeedbackCircle number={otherPlayerFeedback.feedback[1]} />
+                  </div>
+                  <div className="flex flex-row space-x-1">
+                    <FeedbackCircle number={otherPlayerFeedback.feedback[2]} />
+                    <FeedbackCircle number={otherPlayerFeedback.feedback[3]} />
+                  </div>
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
+          </>
+        ))}
       </div>
     </>
   );

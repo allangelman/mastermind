@@ -99,7 +99,8 @@ export default function GamePage({
               game_id,
               board_id,
               existingRowsReady,
-              result ? result : undefined
+              result ? result : undefined,
+              newBoard
             )
           }
         />
@@ -125,6 +126,7 @@ export const getServerSideProps: GetServerSideProps<
   let existingRows: existingRowData[] = [];
   let result: GameResult | null = null;
   let newBoard: boolean = false;
+  // let invitedBoard: boolean = false;
 
   if (typeof query?.boardId === "string" && query.boardId) {
     boardId = query?.boardId;
@@ -160,6 +162,7 @@ export const getServerSideProps: GetServerSideProps<
       existingRows: existingRows,
       result: result,
       newBoard: newBoard,
+      invitedBoard: true,
     },
   };
 };
