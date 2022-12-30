@@ -4,52 +4,98 @@ import cn from "classnames";
 import { GameBoardRowModel } from "../models/GameBoardRowModel";
 import * as Dialog from "@radix-ui/react-dialog";
 import { useRouter } from "next/router";
+import { GET_OTHER_BOARDS_FEEDBACK } from "../lib/graphQLClient";
+import { OtherFeedbackModel } from "../models/OtherFeedbackModel";
 
 interface GameProps {
   board: GameBoardModel;
 }
+
+const POLL_DELAY = 1000;
 
 export const GameBoard = ({ board }: GameProps) => {
   const [currentRound, setCurrentRound] = useState<number>(board.currentRound);
   const [gameResult, setGameResult] = useState<GameResult | undefined>(
     board.gameResult
   );
+  const [otherFeedback, setOtherFeedback] = useState<OtherFeedbackModel[]>([]);
+
+  useEffect(() => {
+    console.log("useEffect");
+    // async function fetchData() {
+    //   await board.poll();
+    // }
+    // fetchData();
+    const pollBoard = async (): Promise<void> => {
+      const boardsddd = await board.getOtherBoardFeedback();
+
+      const boardONE = boardsddd[0];
+      // this.otherBoardData = boardONE;
+      console.log(boardONE);
+      setOtherFeedback(boardONE.rows ?? []);
+      console.log(boardONE.rows);
+      if (!boardONE.result) setTimeout(pollBoard, POLL_DELAY);
+      else {
+        // resolve();
+      }
+    };
+
+    pollBoard();
+
+    // setOtherFeedback(board.otherBoardData?.rows ?? []);
+  }, [board, setOtherFeedback, board.otherBoardData?.rows]);
 
   const gameEnded = gameResult !== undefined;
   const router = useRouter();
-
+  console.log("HELLOOO: ", otherFeedback);
   return (
     <>
-      <div className="mx-auto flex flex-col items-center w-[300px] space-y-4">
-        <div className="flex flex-col space-y-2">
-          <>
-            {board.gameBoard.map((rowModel, i) => (
-              <Row
-                key={i}
-                rowModel={rowModel}
-                numSlots={board.numSlots}
-                board={board}
-                currentRound={currentRound}
-                setCurrentRound={setCurrentRound}
-                setGameResult={setGameResult}
-              />
-            ))}
-          </>
-        </div>
-        {gameEnded && (
-          <div className="flex flex-col items-center">
-            <div>{gameResult === "Won" ? "WON!" : "LOST :("}</div>
-            <div>code: {board.code}</div>
-            <button
-              onClick={() => {
-                router.push(`/`);
-              }}
-              className="w-40 h-10 flex justify-center items-center bg-green-200 hover:bg-green-300 rounded-lg"
-            >
-              Play Another Game
-            </button>
+      <div className=" mx-auto w-[500px] flex flex-row space-x-4">
+        <div className=" flex flex-col items-center w-[300px] space-y-4 bg-yellow-500">
+          <div className="flex flex-col space-y-2">
+            <>
+              {board.gameBoard.map((rowModel, i) => (
+                <Row
+                  key={i}
+                  rowModel={rowModel}
+                  numSlots={board.numSlots}
+                  board={board}
+                  currentRound={currentRound}
+                  setCurrentRound={setCurrentRound}
+                  setGameResult={setGameResult}
+                />
+              ))}
+            </>
           </div>
-        )}
+          {gameEnded && (
+            <div className="flex flex-col items-center">
+              <div>{gameResult === "Won" ? "WON!" : "LOST :("}</div>
+              <div>code: {board.code}</div>
+              <button
+                onClick={() => {
+                  router.push(`/`);
+                }}
+                className="w-40 h-10 flex justify-center items-center bg-green-200 hover:bg-green-300 rounded-lg"
+              >
+                Play Another Game
+              </button>
+            </div>
+          )}
+        </div>
+        <div className=" bg-blue-400 space-y-4">
+          {otherFeedback.map((otherFeedbackModel, i) => (
+            <div key={i} className="flex flex-col space-y-1 h-10">
+              <div className="flex flex-row space-x-1">
+                <FeedbackCircle number={otherFeedbackModel.feedback[0]} />
+                <FeedbackCircle number={otherFeedbackModel.feedback[1]} />
+              </div>
+              <div className="flex flex-row space-x-1">
+                <FeedbackCircle number={otherFeedbackModel.feedback[2]} />
+                <FeedbackCircle number={otherFeedbackModel.feedback[3]} />
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
     </>
   );

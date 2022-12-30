@@ -10,7 +10,13 @@ import {
   getBoardData,
   getBoardVariables,
   GET_BOARD,
+  getOtherBoardData,
+  getOtherBoardVariables,
+  GET_OTHER_BOARDS_FEEDBACK,
+  otherBoardData,
+  rowFeedbackData,
 } from "../lib/graphQLClient";
+import { OtherBoardModel } from "./OtherBoardModel";
 
 export type GameResult = "Won" | "Lost";
 
@@ -28,6 +34,7 @@ export class GameBoardModel {
   gameId: string;
   players: PlayerModel[] = [];
   existingRows: GameBoardRowModel[];
+  otherBoardData?: OtherBoardModel;
   gql: GQLClient;
 
   constructor(
@@ -68,20 +75,19 @@ export class GameBoardModel {
 
   async poll(): Promise<void> {
     return new Promise<void>((resolve) => {
-      const initialStatus = this.uploadStatus;
-      const updateFileStatus = async (): Promise<void> => {
-        const status = await this.fileService.uploadStatus(this.id);
-        this.setStatus(status);
-        if (status === "active") setTimeout(updateFileStatus, POLL_DELAY);
+      const pollBoard = async (): Promise<void> => {
+        const board = await this.getOtherBoardFeedback();
+
+        const boardONE = board[0];
+        this.otherBoardData = boardONE;
+
+        if (!boardONE.result) setTimeout(pollBoard, POLL_DELAY);
         else {
-          if (status === "completed") this.store.addProcessedFiles(this.id);
-          if (status === "failed" && initialStatus === "active")
-            this.store.addFailedFiles(this.id);
           resolve();
         }
       };
 
-      updateFileStatus();
+      pollBoard();
     });
   }
 
@@ -126,13 +132,23 @@ export class GameBoardModel {
     );
   }
 
-  async getOtherBoardFeedback(boardId: string): Promise<void> {
+  async getOtherBoardFeedback(): Promise<OtherBoardModel[]> {
     const getBoardData = await this.gql.request<
-      getBoardData,
-      getBoardVariables
-    >(GET_BOARD, {
-      id: boardId,
+      getOtherBoardData,
+      getOtherBoardVariables
+    >(GET_OTHER_BOARDS_FEEDBACK, {
+      gameId: this.gameId,
+      myBoardId: this.id,
     });
+
+    const feedbackList = getBoardData.findOtherPlayerGameBoards;
+
+    const values = feedbackList.map(
+      (data: otherBoardData) =>
+        new OtherBoardModel(data.id, data.rows, data.result)
+    );
+
+    return values;
   }
 
   async checkNameAvailablity(name: string): Promise<boolean> {

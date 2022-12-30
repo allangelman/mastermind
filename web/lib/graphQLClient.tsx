@@ -73,6 +73,37 @@ export interface getBoardVariables {
   id: string;
 }
 
+export const GET_OTHER_BOARDS_FEEDBACK = gql`
+  query findOtherPlayerGameBoards($gameId: ID!, $myBoardId: ID!) {
+    findOtherPlayerGameBoards(gameId: $gameId, myBoardId: $myBoardId) {
+      id
+      result
+      rows {
+        feedback
+      }
+    }
+  }
+`;
+
+export interface rowFeedbackData {
+  feedback: string;
+}
+
+export interface otherBoardData {
+  id: string;
+  result?: "Won" | "Lost";
+  rows: rowFeedbackData[];
+}
+
+export interface getOtherBoardData {
+  findOtherPlayerGameBoards: otherBoardData[];
+}
+
+export interface getOtherBoardVariables {
+  gameId: string;
+  myBoardId: string;
+}
+
 export const CREATE_GAME = gql`
   mutation createGame($createGameInput: CreateGameInput!) {
     createGame(createGameInput: $createGameInput) {
