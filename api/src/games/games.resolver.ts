@@ -24,12 +24,12 @@ export class GamesResolver {
 
   @Mutation(() => Game)
   updateMultiplayerGameResult(
-    @Args('updateGameBoardInput')
-    updateGameBoardInput: UpdateMultGameBoardInput,
+    @Args('updateMultGameBoardInput')
+    updateMultGameBoardInput: UpdateMultGameBoardInput,
   ): Promise<Game> {
     return this.gamesService.updateResult(
-      updateGameBoardInput.id,
-      updateGameBoardInput.multiplayer_result,
+      updateMultGameBoardInput.id,
+      updateMultGameBoardInput.multiplayer_result,
     );
   }
 }
