@@ -74,26 +74,24 @@ export default function GamePage({
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Header />
-      <div className="mx-auto w-[500px] space-y-2">
-        <div className="flex justify-center">{code}</div>
-        <GameBoard
-          board={
-            new GameBoardModel(
-              4,
-              10,
-              options,
-              code.split("").map((char) => parseInt(char)),
-              game_id,
-              board_id,
-              existingRowsReady,
-              result ? result : undefined,
-              name ? name : undefined,
-              multiplayerResult ? multiplayerResult : undefined
-            )
-          }
-        />
-        <Options options={options} />
-      </div>
+
+      <div className="flex justify-center">{code}</div>
+      <GameBoard
+        board={
+          new GameBoardModel(
+            4,
+            10,
+            options,
+            code.split("").map((char) => parseInt(char)),
+            game_id,
+            board_id,
+            existingRowsReady,
+            result ? result : undefined,
+            name ? name : undefined,
+            multiplayerResult ? multiplayerResult : undefined
+          )
+        }
+      />
     </>
   );
 }

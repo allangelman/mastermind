@@ -18,7 +18,7 @@ import { OtherBoardModel } from "./OtherBoardModel";
 export type GameResult = "Won" | "Lost";
 
 export class GameBoardModel {
-  private readonly options: OptionsModel;
+  readonly options: OptionsModel;
   readonly numSlots: number;
   currentRound: number;
   gameBoard: GameBoardRowModel[];
@@ -29,7 +29,6 @@ export class GameBoardModel {
   gameId: string;
   existingRows: GameBoardRowModel[];
   otherBoardData?: OtherBoardModel;
-
   name?: string;
   multiPlayerResult?: string;
   gql: GQLClient;
