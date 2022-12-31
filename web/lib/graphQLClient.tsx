@@ -27,6 +27,7 @@ export const GET_GAME = gql`
   query findGameById($id: ID!) {
     findGameById(id: $id) {
       code
+      multiplayer_result
     }
   }
 `;
@@ -34,6 +35,7 @@ export const GET_GAME = gql`
 export interface getGameData {
   findGameById: {
     code: string;
+    multiplayer_result?: string;
   };
 }
 
@@ -47,6 +49,7 @@ export const GET_BOARD = gql`
   query findGameBoardById($id: ID!) {
     findGameBoardById(id: $id) {
       result
+      name
       rows {
         row_num
         values
@@ -64,6 +67,7 @@ export interface existingRowData {
 
 export interface getBoardData {
   findGameBoardById: {
+    name?: string;
     result?: "Won" | "Lost";
     rows: existingRowData[];
   };
@@ -78,6 +82,7 @@ export const GET_OTHER_BOARDS_FEEDBACK = gql`
     findOtherPlayerGameBoards(gameId: $gameId, myBoardId: $myBoardId) {
       id
       result
+      name
       rows {
         feedback
       }
@@ -92,6 +97,7 @@ export interface rowFeedbackData {
 export interface otherBoardData {
   id: string;
   result?: "Won" | "Lost";
+  name?: string;
   rows: rowFeedbackData[];
 }
 
@@ -144,6 +150,7 @@ export interface createBoardData {
 export interface createBoardVariables {
   createGameBoardInput: {
     game_id: string;
+    name?: string;
   };
 }
 
@@ -198,5 +205,32 @@ export interface updateBoardResultVariables {
   updateGameBoardInput: {
     id: string;
     result: string;
+  };
+}
+
+export const UPDATE_MULTI_GAME_RESULT = gql`
+  mutation updateMultiplayerGameResult(
+    $updateMultGameBoardInput: UpdateMultGameBoardInput!
+  ) {
+    updateMultiplayerGameResult(
+      updateMultGameBoardInput: $updateMultGameBoardInput
+    ) {
+      id
+      multiplayer_result
+    }
+  }
+`;
+
+export interface updateMultiGameResultData {
+  updateMultiplayerGameResult: {
+    multiplayer_result: string;
+    id: string;
+  };
+}
+
+export interface updateMultiGameResultVariables {
+  updateMultGameBoardInput: {
+    id: string;
+    multiplayer_result: string;
   };
 }

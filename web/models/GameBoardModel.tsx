@@ -7,14 +7,13 @@ import {
   updateBoardResultData,
   updateBoardResultVariables,
   UPDATE_GAME_RESULT,
-  getBoardData,
-  getBoardVariables,
-  GET_BOARD,
   getOtherBoardData,
   getOtherBoardVariables,
   GET_OTHER_BOARDS_FEEDBACK,
   otherBoardData,
-  rowFeedbackData,
+  UPDATE_MULTI_GAME_RESULT,
+  updateMultiGameResultData,
+  updateMultiGameResultVariables,
 } from "../lib/graphQLClient";
 import { OtherBoardModel } from "./OtherBoardModel";
 
@@ -36,6 +35,8 @@ export class GameBoardModel {
   existingRows: GameBoardRowModel[];
   otherBoardData?: OtherBoardModel;
   multiPlayerStarted?: boolean;
+  name?: string;
+  multiPlayerResult?: string;
   gql: GQLClient;
 
   constructor(
@@ -47,7 +48,9 @@ export class GameBoardModel {
     id: string,
     existingRows: GameBoardRowModel[],
     gameResult?: GameResult,
-    multiPlayerStarted?: boolean
+    multiPlayerStarted?: boolean,
+    name?: string,
+    multiPlayerResult?: string
   ) {
     this.numSlots = numSlots;
     this.id = id;
@@ -62,7 +65,8 @@ export class GameBoardModel {
     this.existingRows = existingRows;
     this.gameResult = gameResult;
     this.multiPlayerStarted = multiPlayerStarted;
-
+    this.name = name;
+    this.multiPlayerResult = multiPlayerResult;
     this.gql = new GQLClient();
 
     for (let i = 0; i < existingRows.length; i++) {
@@ -122,9 +126,7 @@ export class GameBoardModel {
   }
 
   async updateResult(result: string): Promise<void> {
-    const gql = new GQLClient();
-
-    await gql.request<updateBoardResultData, updateBoardResultVariables>(
+    await this.gql.request<updateBoardResultData, updateBoardResultVariables>(
       UPDATE_GAME_RESULT,
       {
         updateGameBoardInput: {
@@ -133,6 +135,18 @@ export class GameBoardModel {
         },
       }
     );
+  }
+
+  async updateMultiPlayerResult(result: string): Promise<void> {
+    await this.gql.request<
+      updateMultiGameResultData,
+      updateMultiGameResultVariables
+    >(UPDATE_MULTI_GAME_RESULT, {
+      updateMultGameBoardInput: {
+        id: this.gameId,
+        multiplayer_result: result,
+      },
+    });
   }
 
   async getOtherBoardFeedback(): Promise<OtherBoardModel[]> {
@@ -148,9 +162,9 @@ export class GameBoardModel {
 
     const values = feedbackList.map(
       (data: otherBoardData) =>
-        new OtherBoardModel(data.id, data.rows, data.result)
+        new OtherBoardModel(data.id, data.rows, data.name, data.result)
     );
-    console.log("heyyy: ", values);
+
     return values;
   }
 

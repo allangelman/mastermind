@@ -4,8 +4,6 @@ import cn from "classnames";
 import { GameBoardRowModel } from "../models/GameBoardRowModel";
 import * as Dialog from "@radix-ui/react-dialog";
 import { useRouter } from "next/router";
-import { GET_OTHER_BOARDS_FEEDBACK } from "../lib/graphQLClient";
-import { OtherFeedbackModel } from "../models/OtherFeedbackModel";
 import { OtherBoardModel } from "../models/OtherBoardModel";
 
 interface GameProps {
@@ -19,87 +17,82 @@ export const GameBoard = ({ board }: GameProps) => {
   const [gameResult, setGameResult] = useState<GameResult | undefined>(
     board.gameResult
   );
+  const [multiPlayerGameResult, setMultiPlayerGameResult] = useState<
+    string | undefined
+  >(board.multiPlayerResult);
+
   const [otherPlayerFeedback, setOtherPlayerFeedback] = useState<
     OtherBoardModel[]
   >([]);
-  const [alreadyStarted, setAlreadtStarted] = useState<boolean>();
-  // const board = await board.getOtherBoardFeedback();
-  // useEffect(() => {
-  //   console.log("useEffect, ", otherPlayerFeedback);
 
-  //   const pollOtherPlayerBoards = async (): Promise<void> => {
-  //     const otherPlayerBoards = await board.getOtherBoardFeedback();
-  //     // if (otherPlayerBoards.length < 1) return;
-  //     // const firstPlayerBoard = otherPlayerBoards[0];
-  //     // this.otherBoardData = boardONE;
-
-  //     setOtherPlayerFeedback(otherPlayerBoards);
-  //     setTimeout(pollOtherPlayerBoards, POLL_DELAY);
-  //     // if (!firstPlayerBoard.result)
-  //     //   setTimeout(pollOtherPlayerBoards, POLL_DELAY);
-  //     // else {
-  //     //   // resolve();
-  //     // }
-  //   };
-
-  //   pollOtherPlayerBoards();
-
-  //   // setOtherFeedback(board.otherBoardData?.rows ?? []);
-  // }, [board, setOtherPlayerFeedback, board.otherBoardData?.rows]);
+  const router = useRouter();
+  const query = router.query;
 
   useEffect(() => {
     const fetchData = async (): Promise<void> => {
-      const otherboards = await board.getOtherBoardFeedback();
-      console.log(otherboards);
-      if (otherboards.length > 0) {
-        pollOtherPlayerBoards();
-        setAlreadtStarted(true);
+      if (query.multiplayer && !multiPlayerGameResult) {
+        await pollOtherPlayerBoards();
       }
     };
-
     fetchData();
-    // if (alreadyStarted) {
-    //   pollOtherPlayerBoards();
-    // }
   }, []);
 
   const pollOtherPlayerBoards = async (): Promise<void> => {
-    const otherPlayerBoards = await board.getOtherBoardFeedback();
-    // if (otherPlayerBoards.length < 1) return;
-    // const firstPlayerBoard = otherPlayerBoards[0];
-    // this.otherBoardData = boardONE;
+    return new Promise<void>(async (resolve) => {
+      const otherPlayerBoards = await board.getOtherBoardFeedback();
 
-    setOtherPlayerFeedback(otherPlayerBoards);
-    setTimeout(pollOtherPlayerBoards, POLL_DELAY);
-    // if (!firstPlayerBoard.result)
-    //   setTimeout(pollOtherPlayerBoards, POLL_DELAY);
-    // else {
-    //   // resolve();
-    // }
+      setOtherPlayerFeedback(otherPlayerBoards);
+
+      const resultsMap: Map<GameResult | "", string> = new Map([]);
+
+      resultsMap.set(
+        board.gameResult ? board.gameResult : "",
+        board.name ?? "anon" //shouldn't ever be anon
+      );
+
+      let allPlayersLost = true;
+      otherPlayerBoards.forEach((otherBoard) => {
+        resultsMap.set(
+          otherBoard.result ? otherBoard.result : "",
+          otherBoard.name ?? "anon" //shouldn't ever be anon
+        );
+      });
+
+      resultsMap.forEach((result) => {
+        if (result !== "Lost") {
+          allPlayersLost = false;
+        }
+      });
+
+      console.log(resultsMap);
+
+      const gameEnded = resultsMap.has("Won") || allPlayersLost;
+
+      if (!gameEnded) {
+        setTimeout(pollOtherPlayerBoards, POLL_DELAY);
+      } else {
+        if (resultsMap.has("Won")) {
+          const name = resultsMap.get("Won");
+          setMultiPlayerGameResult(`${name} Won!`);
+          await board.updateMultiPlayerResult(`${name} Won!`);
+        } else if (allPlayersLost) {
+          setMultiPlayerGameResult(`All lost!`);
+          await board.updateMultiPlayerResult(`All lost!`);
+        } else {
+          setMultiPlayerGameResult(undefined);
+        }
+        resolve();
+      }
+    });
   };
 
-  // pollOtherPlayerBoards();
-
   const gameEnded = gameResult !== undefined;
-  const router = useRouter();
-  // console.log("HELLOOO: ", otherPlayerFeedback);
+
   return (
     <>
       <div className=" mx-auto w-[500px] flex flex-row space-x-4">
-        <button
-          onClick={() => {
-            pollOtherPlayerBoards();
-            setAlreadtStarted(true);
-          }}
-          disabled={alreadyStarted}
-          className={cn("w-20 h-10", {
-            "bg-green-500": !alreadyStarted,
-            "bg-green-200": alreadyStarted,
-          })}
-        >
-          start
-        </button>
-        <div className=" flex flex-col items-center w-[300px] space-y-4 bg-yellow-500">
+        <div className=" flex flex-col items-center w-[300px]">
+          <div>{board.name}</div>
           <div className="flex flex-col space-y-2">
             <>
               {board.gameBoard.map((rowModel, i) => (
@@ -115,13 +108,27 @@ export const GameBoard = ({ board }: GameProps) => {
               ))}
             </>
           </div>
-          {gameEnded && (
+          {gameEnded && !query.multiplayer && (
             <div className="flex flex-col items-center">
               <div>{gameResult === "Won" ? "WON!" : "LOST :("}</div>
               <div>code: {board.code}</div>
               <button
                 onClick={() => {
-                  router.push(`/`);
+                  router.push(`/start`);
+                }}
+                className="w-40 h-10 flex justify-center items-center bg-green-200 hover:bg-green-300 rounded-lg"
+              >
+                Play Another Game
+              </button>
+            </div>
+          )}
+          {multiPlayerGameResult && (
+            <div className="flex flex-col items-center">
+              <div>{multiPlayerGameResult}</div>
+              <div>code: {board.code}</div>
+              <button
+                onClick={() => {
+                  router.push(`/start`);
                 }}
                 className="w-40 h-10 flex justify-center items-center bg-green-200 hover:bg-green-300 rounded-lg"
               >
@@ -132,24 +139,33 @@ export const GameBoard = ({ board }: GameProps) => {
         </div>
         {otherPlayerFeedback.map((otherPlayerFeedback, i) => (
           <>
-            <div key={`id-${i}`}>{otherPlayerFeedback.id}</div>
-            <div key={`feedback-${i}`} className="bg-blue-400 space-y-4">
-              {otherPlayerFeedback.rows.map((otherPlayerFeedback, i) => (
-                // <div>{otherPlayerFeedback.id}</div>
-                <div
-                  key={`individual - ${i}`}
-                  className="flex flex-col space-y-1 h-10"
-                >
-                  <div className="flex flex-row space-x-1">
-                    <FeedbackCircle number={otherPlayerFeedback.feedback[0]} />
-                    <FeedbackCircle number={otherPlayerFeedback.feedback[1]} />
+            <div className="flex flex-col">
+              <div key={`id-${i}`}>{otherPlayerFeedback.name}</div>
+              <div key={`feedback-${i}`} className="space-y-2 pt-2">
+                {otherPlayerFeedback.rows.map((otherPlayerFeedback, i) => (
+                  <div
+                    key={`individual - ${i}`}
+                    className="flex flex-col items-center  space-y-1 h-10"
+                  >
+                    <div className="flex flex-row space-x-1">
+                      <FeedbackCircle
+                        number={otherPlayerFeedback.feedback[0]}
+                      />
+                      <FeedbackCircle
+                        number={otherPlayerFeedback.feedback[1]}
+                      />
+                    </div>
+                    <div className="flex flex-row space-x-1">
+                      <FeedbackCircle
+                        number={otherPlayerFeedback.feedback[2]}
+                      />
+                      <FeedbackCircle
+                        number={otherPlayerFeedback.feedback[3]}
+                      />
+                    </div>
                   </div>
-                  <div className="flex flex-row space-x-1">
-                    <FeedbackCircle number={otherPlayerFeedback.feedback[2]} />
-                    <FeedbackCircle number={otherPlayerFeedback.feedback[3]} />
-                  </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </>
         ))}

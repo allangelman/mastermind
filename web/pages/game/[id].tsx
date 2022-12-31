@@ -30,6 +30,8 @@ type GamePageProps = {
   existingRows: existingRowData[];
   result?: GameResult | null;
   newBoard: boolean;
+  name?: string | null;
+  multiplayerResult?: string;
 };
 
 export default function GamePage({
@@ -39,6 +41,8 @@ export default function GamePage({
   existingRows,
   result,
   newBoard,
+  name,
+  multiplayerResult,
 }: GamePageProps) {
   const options = new OptionsModel(8);
   const router = useRouter();
@@ -84,11 +88,7 @@ export default function GamePage({
       <Header />
       <div className="mx-auto w-[500px] space-y-2">
         <div className="flex justify-center">{code}</div>
-        <div>To invite others, send this link:</div>
-        <div>
-          mastermind-olive.vercel.app/game/
-          {game_id}
-        </div>
+        <div> game code: {game_id} </div>
         <GameBoard
           board={
             new GameBoardModel(
@@ -100,7 +100,9 @@ export default function GamePage({
               board_id,
               existingRowsReady,
               result ? result : undefined,
-              newBoard
+              newBoard,
+              name ? name : undefined,
+              multiplayerResult ? multiplayerResult : undefined
             )
           }
         />
@@ -126,7 +128,7 @@ export const getServerSideProps: GetServerSideProps<
   let existingRows: existingRowData[] = [];
   let result: GameResult | null = null;
   let newBoard: boolean = false;
-  // let invitedBoard: boolean = false;
+  let name: string | null = null;
 
   if (typeof query?.boardId === "string" && query.boardId) {
     boardId = query?.boardId;
@@ -152,17 +154,21 @@ export const getServerSideProps: GetServerSideProps<
     result = getBoardData?.findGameBoardById.result
       ? getBoardData?.findGameBoardById.result
       : null;
+    name = getBoardData?.findGameBoardById.name
+      ? getBoardData?.findGameBoardById.name
+      : null;
   }
 
   return {
     props: {
       code: gameData?.findGameById.code,
+      multiplayer_result: gameData.findGameById.multiplayer_result,
       game_id: params?.id ?? "",
       board_id: boardId ? boardId : "",
       existingRows: existingRows,
       result: result,
       newBoard: newBoard,
-      invitedBoard: true,
+      name: name,
     },
   };
 };

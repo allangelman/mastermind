@@ -1,28 +1,12 @@
-import { GetServerSideProps } from "next";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import { useEffect } from "react";
 
-import {
-  createBoardData,
-  createBoardVariables,
-  createGameData,
-  createGameVariables,
-  CREATE_GAME,
-  CREATE_GAME_BOARD,
-  GQLClient,
-} from "../lib/graphQLClient";
-
-type GamePageProps = {
-  game_id: string;
-  board_id: string;
-};
-
-export default function Home({ game_id, board_id }: GamePageProps) {
+export default function Home() {
   const router = useRouter();
 
   useEffect(() => {
-    router.push(`/game/${game_id}?boardId=${board_id}`);
+    router.push(`/start`);
   }, [router]);
 
   return (
@@ -36,35 +20,3 @@ export default function Home({ game_id, board_id }: GamePageProps) {
     </>
   );
 }
-
-export const getServerSideProps: GetServerSideProps<
-  GamePageProps
-> = async () => {
-  const response = await fetch(
-    "https://www.random.org/integers/?num=4&min=0&max=7&col=1&base=10&format=plain&rnd=new"
-  );
-  const codeWithNewLines = await response.text();
-  const codeArray = codeWithNewLines.split("\n");
-  const code = codeArray.join("");
-
-  const gql = new GQLClient();
-
-  const gameData = await gql.request<createGameData, createGameVariables>(
-    CREATE_GAME,
-    { createGameInput: { code } }
-  );
-
-  const boardData = await gql.request<createBoardData, createBoardVariables>(
-    CREATE_GAME_BOARD,
-    {
-      createGameBoardInput: { game_id: gameData.createGame.id },
-    }
-  );
-
-  return {
-    props: {
-      game_id: gameData.createGame.id,
-      board_id: boardData.createGameBoard.id,
-    },
-  };
-};
