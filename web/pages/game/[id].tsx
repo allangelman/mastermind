@@ -103,30 +103,23 @@ export const getServerSideProps: GetServerSideProps<
   { id: string }
 > = async ({ params, query }) => {
   const gql = new GQLClient();
+
   const gameData = await gql.request<getGameData, getGameVariables>(GET_GAME, {
     id: params?.id ?? "",
   });
 
-  let getBoardData: getBoardData;
   let boardId: string | undefined;
-  let existingRows: existingRowData[] = [];
-  let result: GameResult | null = null;
-  let name: string | null = null;
 
   if (typeof query?.boardId === "string" && query.boardId) {
     boardId = query?.boardId;
   }
 
-  getBoardData = await gql.request<getBoardData, getBoardVariables>(GET_BOARD, {
-    id: boardId ? boardId : "",
-  });
-  existingRows = getBoardData?.findGameBoardById.rows;
-  result = getBoardData?.findGameBoardById.result
-    ? getBoardData?.findGameBoardById.result
-    : null;
-  name = getBoardData?.findGameBoardById.name
-    ? getBoardData?.findGameBoardById.name
-    : null;
+  const getBoardData = await gql.request<getBoardData, getBoardVariables>(
+    GET_BOARD,
+    {
+      id: boardId ? boardId : "",
+    }
+  );
 
   return {
     props: {
@@ -134,9 +127,9 @@ export const getServerSideProps: GetServerSideProps<
       multiplayer_result: gameData.findGameById.multiplayer_result,
       game_id: params?.id ?? "",
       board_id: boardId ? boardId : "",
-      existingRows: existingRows,
-      result: result,
-      name: name,
+      existingRows: getBoardData?.findGameBoardById.rows,
+      result: getBoardData?.findGameBoardById.result ?? null,
+      name: getBoardData?.findGameBoardById.name ?? null,
     },
   };
 };

@@ -13,6 +13,9 @@ import {
   CREATE_GAME_BOARD,
   GQLClient,
 } from "../lib/graphQLClient";
+import { StartPageButton } from "../components/StartPageButton";
+import { StartPageSeperator } from "../components/StartPageSeperator";
+import { StartPageInput } from "../components/StartPageInput";
 
 type StartPageProps = {
   code: string;
@@ -21,17 +24,45 @@ type StartPageProps = {
 export default function Start({ code }: StartPageProps) {
   const router = useRouter();
 
-  const [isStartButtonDisabled, setStartButtonDisabled] =
-    useState<boolean>(true);
   const [inputNameStartValue, setInputNameStartValue] = useState<string>("");
-
   const [inputNameJoinValue, setInputNameJoinValue] = useState<string>("");
   const [inputGameJoinValue, setInputGameJoinValue] = useState<string>("");
-
   const isJoinButtonDisabled =
     inputNameJoinValue === "" || inputGameJoinValue === "";
+  const isStartButtonDisabled = inputNameStartValue === "";
+
+  const [singlePlayerLoading, setIsSinglePlayerLoading] =
+    useState<boolean>(false);
+  const [multiPlayerLoading, setIsMutiPlayerLoading] = useState<boolean>(false);
+  const [joinLoading, setIsJoinLoading] = useState<boolean>(false);
 
   const gql = new GQLClient();
+
+  const createGame = async (code: string): Promise<createGameData> => {
+    const gameData = await gql.request<createGameData, createGameVariables>(
+      CREATE_GAME,
+      {
+        createGameInput: { code },
+      }
+    );
+    return gameData;
+  };
+
+  const createBoard = async (
+    gameId: string,
+    name?: string
+  ): Promise<createBoardData> => {
+    const boardData = await gql.request<createBoardData, createBoardVariables>(
+      CREATE_GAME_BOARD,
+      {
+        createGameBoardInput: {
+          game_id: gameId,
+          name: name,
+        },
+      }
+    );
+    return boardData;
+  };
 
   return (
     <>
@@ -43,114 +74,77 @@ export default function Start({ code }: StartPageProps) {
       </Head>
       <Header />
       <div className="mx-auto w-[500px] flex flex-col items-center space-y-2">
-        <button
+        <StartPageButton
           onClick={async () => {
-            const gameData = await gql.request<
-              createGameData,
-              createGameVariables
-            >(CREATE_GAME, { createGameInput: { code } });
-
-            const boardData = await gql.request<
-              createBoardData,
-              createBoardVariables
-            >(CREATE_GAME_BOARD, {
-              createGameBoardInput: {
-                game_id: gameData.createGame.id,
-                name: inputNameStartValue,
-              },
-            });
+            setIsSinglePlayerLoading(true);
+            const gameData = await createGame(code);
+            const boardData = await createBoard(gameData.createGame.id).finally(
+              () => setIsSinglePlayerLoading(false)
+            );
             router.push(
               `/game/${gameData.createGame.id}?boardId=${boardData.createGameBoard.id}`
             );
           }}
-          className={"h-10 rounded-lg px-2 bg-green-500"}
-        >
-          start single player
-        </button>
-        <div className="border w-[200px]" />
-        <div className="flex flex-row justify-center items-center space-x-2">
-          <div> player name</div>
-          <input
-            className="w-30 h-10 rounded-lg border-2"
-            value={inputNameStartValue}
-            onChange={(e) => {
-              setInputNameStartValue(e.target.value);
-              setStartButtonDisabled(e.target.value === "");
-            }}
-          ></input>
-        </div>
-        <button
-          onClick={async () => {
-            const gameData = await gql.request<
-              createGameData,
-              createGameVariables
-            >(CREATE_GAME, { createGameInput: { code } });
+          loading={singlePlayerLoading}
+          text={"start single player"}
+        />
 
-            const boardData = await gql.request<
-              createBoardData,
-              createBoardVariables
-            >(CREATE_GAME_BOARD, {
-              createGameBoardInput: {
-                game_id: gameData.createGame.id,
-                name: inputNameStartValue,
-              },
-            });
+        <StartPageSeperator />
+
+        <StartPageInput
+          inputValue={inputNameStartValue}
+          label={"player name"}
+          onChange={(e) => {
+            setInputNameStartValue(e.target.value);
+          }}
+        />
+        <StartPageButton
+          onClick={async () => {
+            setIsMutiPlayerLoading(true);
+            const gameData = await createGame(code);
+            const boardData = await createBoard(
+              gameData.createGame.id,
+              inputNameStartValue
+            ).finally(() => setIsMutiPlayerLoading(false));
             router.push(
               `/game/${gameData.createGame.id}?boardId=${boardData.createGameBoard.id}&multiplayer=true`
             );
           }}
-          className={cn("h-10 rounded-lg px-2", {
-            "bg-green-200": isStartButtonDisabled,
-            "bg-green-500": !isStartButtonDisabled,
-          })}
           disabled={isStartButtonDisabled}
-        >
-          start multi player
-        </button>
-        <div className="border w-[200px]" />
-        <div className="flex flex-row justify-center items-center space-x-2">
-          <div> player name</div>
-          <input
-            className="w-30 h-10 rounded-lg border-2"
-            value={inputNameJoinValue}
-            onChange={(e) => {
-              setInputNameJoinValue(e.target.value);
-            }}
-          ></input>
-        </div>
-        <div className="flex flex-row justify-center items-center space-x-2">
-          <div> game code</div>
-          <input
-            className="w-30 h-10 rounded-lg border-2"
-            value={inputGameJoinValue}
-            onChange={(e) => {
-              setInputGameJoinValue(e.target.value);
-            }}
-          ></input>
-        </div>
-        <button
+          loading={multiPlayerLoading}
+          text={"start multi player"}
+        />
+
+        <StartPageSeperator />
+
+        <StartPageInput
+          inputValue={inputNameJoinValue}
+          label={"player name"}
+          onChange={(e) => {
+            setInputNameJoinValue(e.target.value);
+          }}
+        />
+        <StartPageInput
+          inputValue={inputGameJoinValue}
+          label={"game code"}
+          onChange={(e) => {
+            setInputGameJoinValue(e.target.value);
+          }}
+        />
+        <StartPageButton
           onClick={async () => {
-            const boardData = await gql.request<
-              createBoardData,
-              createBoardVariables
-            >(CREATE_GAME_BOARD, {
-              createGameBoardInput: {
-                game_id: inputGameJoinValue,
-                name: inputNameJoinValue,
-              },
-            });
+            const boardData = await createBoard(
+              inputGameJoinValue,
+              inputNameJoinValue
+            ).finally(() => setIsJoinLoading(false));
             router.push(
-              `/game/${inputGameJoinValue}?boardId=${boardData.createGameBoard.id}&multiplayer=true`
+              `/game/${inputGameJoinValue}?boardId=${boardData?.createGameBoard.id}&multiplayer=true`
             );
           }}
-          className={cn("h-10 rounded-lg px-2", {
-            "bg-green-200": isJoinButtonDisabled,
-            "bg-green-500": !isJoinButtonDisabled,
-          })}
           disabled={isJoinButtonDisabled}
-        >
-          join multi player
-        </button>
+          loading={joinLoading}
+          text={"join multi player"}
+        />
       </div>
     </>
   );
