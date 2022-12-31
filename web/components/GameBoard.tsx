@@ -43,38 +43,41 @@ export const GameBoard = ({ board }: GameProps) => {
 
       setOtherPlayerFeedback(otherPlayerBoards);
 
-      const resultsMap: Map<GameResult | "", string> = new Map([]);
+      const resultsMap: Map<string, GameResult | ""> = new Map([]);
 
       resultsMap.set(
-        board.gameResult ? board.gameResult : "",
-        board.name ?? "anon" //shouldn't ever be anon
+        board.name ?? "anon", //shouldn't ever be anon
+        board.gameResult ? board.gameResult : ""
       );
 
-      let allPlayersLost = true;
       otherPlayerBoards.forEach((otherBoard) => {
         resultsMap.set(
-          otherBoard.result ? otherBoard.result : "",
-          otherBoard.name ?? "anon" //shouldn't ever be anon
+          otherBoard.name ?? "anon", //shouldn't ever be anon
+          otherBoard.result ? otherBoard.result : ""
         );
       });
 
-      resultsMap.forEach((result) => {
+      let allPlayersLost = true;
+      let winner;
+      resultsMap.forEach((result, name) => {
+        console.log(result, name);
         if (result !== "Lost") {
           allPlayersLost = false;
         }
+        if (result === "Won") {
+          winner = name;
+        }
       });
+      resultsMap.keys();
 
-      console.log(resultsMap);
+      const multiplayerGameEnded = winner || allPlayersLost;
 
-      const gameEnded = resultsMap.has("Won") || allPlayersLost;
-
-      if (!gameEnded) {
+      if (!multiplayerGameEnded) {
         setTimeout(pollOtherPlayerBoards, POLL_DELAY);
       } else {
-        if (resultsMap.has("Won")) {
-          const name = resultsMap.get("Won");
-          setMultiPlayerGameResult(`${name} Won!`);
-          await board.updateMultiPlayerResult(`${name} Won!`);
+        if (winner) {
+          setMultiPlayerGameResult(`${winner} Won!`);
+          await board.updateMultiPlayerResult(`${winner} Won!`);
         } else if (allPlayersLost) {
           setMultiPlayerGameResult(`All lost!`);
           await board.updateMultiPlayerResult(`All lost!`);
