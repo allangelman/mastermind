@@ -17,10 +17,6 @@ export class GameBoard {
   @Column({ name: 'game_id' })
   game_id!: string;
 
-  @Field({ description: 'player_id.', nullable: true })
-  @Column({ name: 'player_id', nullable: true })
-  player_id?: string;
-
   @Field({ description: 'name.', nullable: true })
   @Column({ name: 'name', nullable: true })
   name?: string;

@@ -19,10 +19,6 @@ export class GamesService {
     return game;
   }
 
-  // findAll() {
-  //   return `This action returns all games`;
-  // }
-
   findOneById(id: string) {
     return this.gamesRepository.findOneBy({ id });
   }
@@ -31,8 +27,4 @@ export class GamesService {
     await this.gamesRepository.update({ id }, { multiplayer_result: result });
     return this.gamesRepository.findOneBy({ id });
   }
-
-  // remove(id: number) {
-  //   return `This action removes a #${id} game`;
-  // }
 }

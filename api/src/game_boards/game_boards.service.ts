@@ -20,10 +20,6 @@ export class GameBoardsService {
     return gameBoard;
   }
 
-  // findAll() {
-  //   return `This action returns all games`;
-  // }
-
   //TODO:this should have return type
   findOneById(id: string) {
     return this.gameBoardsRepository.findOneBy({ id });
@@ -42,8 +38,4 @@ export class GameBoardsService {
     await this.gameBoardsRepository.update({ id }, { result: result });
     return this.gameBoardsRepository.findOneBy({ id });
   }
-
-  // remove(id: number) {
-  //   return `This action removes a #${id} game`;
-  // }
 }
