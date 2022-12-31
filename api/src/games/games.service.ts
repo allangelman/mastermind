@@ -27,6 +27,11 @@ export class GamesService {
     return this.gamesRepository.findOneBy({ id });
   }
 
+  async updateResult(id: string, result: string): Promise<Game> {
+    await this.gamesRepository.update({ id }, { multiplayer_result: result });
+    return this.gamesRepository.findOneBy({ id });
+  }
+
   // remove(id: number) {
   //   return `This action removes a #${id} game`;
   // }

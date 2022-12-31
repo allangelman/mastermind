@@ -17,6 +17,10 @@ export class Game {
   @Column({ name: 'code' })
   code!: string;
 
+  @Field({ description: 'result for multiplayer game.', nullable: true })
+  @Column({ name: 'multiplayer_result', nullable: true })
+  multiplayer_result: string;
+
   @Field({ description: 'Creation timestamp of the game.' })
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   createdAt!: Date;
