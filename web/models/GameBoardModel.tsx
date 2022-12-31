@@ -1,7 +1,5 @@
 import { GameBoardRowModel } from "./GameBoardRowModel";
 import { OptionsModel } from "./OptionsModel";
-import { PlayerModel } from "./PlayerModel";
-import { GraphQLClient, gql } from "graphql-request";
 import {
   GQLClient,
   updateBoardResultData,
@@ -19,8 +17,6 @@ import { OtherBoardModel } from "./OtherBoardModel";
 
 export type GameResult = "Won" | "Lost";
 
-const POLL_DELAY = 3000;
-
 export class GameBoardModel {
   private readonly options: OptionsModel;
   readonly numSlots: number;
@@ -31,10 +27,9 @@ export class GameBoardModel {
   numRows: number;
   code: number[];
   gameId: string;
-  players: PlayerModel[] = [];
   existingRows: GameBoardRowModel[];
   otherBoardData?: OtherBoardModel;
-  multiPlayerStarted?: boolean;
+
   name?: string;
   multiPlayerResult?: string;
   gql: GQLClient;
@@ -48,7 +43,7 @@ export class GameBoardModel {
     id: string,
     existingRows: GameBoardRowModel[],
     gameResult?: GameResult,
-    multiPlayerStarted?: boolean,
+
     name?: string,
     multiPlayerResult?: string
   ) {
@@ -64,7 +59,7 @@ export class GameBoardModel {
     this.gameBoard = [];
     this.existingRows = existingRows;
     this.gameResult = gameResult;
-    this.multiPlayerStarted = multiPlayerStarted;
+
     this.name = name;
     this.multiPlayerResult = multiPlayerResult;
     this.gql = new GQLClient();
@@ -78,24 +73,6 @@ export class GameBoardModel {
       const row = new GameBoardRowModel(this.numSlots, code, i, this.id);
       this.gameBoard.push(row);
     }
-  }
-
-  async poll(): Promise<void> {
-    return new Promise<void>((resolve) => {
-      const pollBoard = async (): Promise<void> => {
-        const board = await this.getOtherBoardFeedback();
-
-        const boardONE = board[0];
-        this.otherBoardData = boardONE;
-
-        if (!boardONE.result) setTimeout(pollBoard, POLL_DELAY);
-        else {
-          resolve();
-        }
-      };
-
-      pollBoard();
-    });
   }
 
   incrementRound(): void {
@@ -119,10 +96,6 @@ export class GameBoardModel {
       this.updateResult("Lost");
       return "Lost";
     }
-  }
-
-  addPlayer(player: PlayerModel): void {
-    this.players.push(player);
   }
 
   async updateResult(result: string): Promise<void> {
@@ -166,25 +139,5 @@ export class GameBoardModel {
     );
 
     return values;
-  }
-
-  async checkNameAvailablity(name: string): Promise<boolean> {
-    const endpoint = " https://mastermind-api.onrender.com/graphql";
-
-    const graphQLClient = new GraphQLClient(endpoint);
-
-    const query = gql`
-      query findAllPlayerNames {
-        findAllPlayerNames
-      }
-    `;
-
-    const { findAllPlayerNames } = await graphQLClient.request(query);
-
-    if (findAllPlayerNames.includes(name)) {
-      return false;
-    } else {
-      return true;
-    }
   }
 }

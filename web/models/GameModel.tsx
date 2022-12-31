@@ -36,18 +36,4 @@ export class GameModel {
       )
     );
   }
-
-  addGameBoard(): void {
-    this.gameBoards.push(
-      new GameBoardModel(
-        this.numSlots,
-        this.numRows,
-        this.options,
-        this.code,
-        this.id,
-        uuidv4(),
-        []
-      )
-    );
-  }
 }

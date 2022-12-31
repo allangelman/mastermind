@@ -8,9 +8,6 @@ import { FeedbackModel } from "../../models/FeedbackModel";
 import { GameBoardRowModel } from "../../models/GameBoardRowModel";
 import { GameBoardModel, GameResult } from "../../models/GameBoardModel";
 import {
-  createBoardData,
-  createBoardVariables,
-  CREATE_GAME_BOARD,
   existingRowData,
   getBoardData,
   getBoardVariables,
@@ -20,8 +17,6 @@ import {
   GET_GAME,
   GQLClient,
 } from "../../lib/graphQLClient";
-import { useRouter } from "next/router";
-import { useEffect } from "react";
 
 type GamePageProps = {
   code: string;
@@ -29,7 +24,7 @@ type GamePageProps = {
   board_id: string;
   existingRows: existingRowData[];
   result?: GameResult | null;
-  newBoard: boolean;
+
   name?: string | null;
   multiplayerResult?: string;
 };
@@ -40,18 +35,11 @@ export default function GamePage({
   board_id,
   existingRows,
   result,
-  newBoard,
+
   name,
   multiplayerResult,
 }: GamePageProps) {
   const options = new OptionsModel(8);
-  const router = useRouter();
-
-  useEffect(() => {
-    if (newBoard) {
-      router.push(`/game/${game_id}?boardId=${board_id}`);
-    }
-  }, [router, newBoard]);
 
   const existingRowsReady = [];
   for (let i = 0; i < existingRows.length; i++) {
@@ -88,7 +76,6 @@ export default function GamePage({
       <Header />
       <div className="mx-auto w-[500px] space-y-2">
         <div className="flex justify-center">{code}</div>
-        <div> game code: {game_id} </div>
         <GameBoard
           board={
             new GameBoardModel(
@@ -100,7 +87,6 @@ export default function GamePage({
               board_id,
               existingRowsReady,
               result ? result : undefined,
-              newBoard,
               name ? name : undefined,
               multiplayerResult ? multiplayerResult : undefined
             )
@@ -117,47 +103,30 @@ export const getServerSideProps: GetServerSideProps<
   { id: string }
 > = async ({ params, query }) => {
   const gql = new GQLClient();
-
   const gameData = await gql.request<getGameData, getGameVariables>(GET_GAME, {
     id: params?.id ?? "",
   });
 
   let getBoardData: getBoardData;
-  let createBoardData: createBoardData;
   let boardId: string | undefined;
   let existingRows: existingRowData[] = [];
   let result: GameResult | null = null;
-  let newBoard: boolean = false;
   let name: string | null = null;
 
   if (typeof query?.boardId === "string" && query.boardId) {
     boardId = query?.boardId;
   }
 
-  if (!boardId) {
-    createBoardData = await gql.request<createBoardData, createBoardVariables>(
-      CREATE_GAME_BOARD,
-      {
-        createGameBoardInput: { game_id: params?.id ?? "" },
-      }
-    );
-    boardId = createBoardData.createGameBoard.id;
-    newBoard = true;
-  } else {
-    getBoardData = await gql.request<getBoardData, getBoardVariables>(
-      GET_BOARD,
-      {
-        id: boardId ? boardId : "",
-      }
-    );
-    existingRows = getBoardData?.findGameBoardById.rows;
-    result = getBoardData?.findGameBoardById.result
-      ? getBoardData?.findGameBoardById.result
-      : null;
-    name = getBoardData?.findGameBoardById.name
-      ? getBoardData?.findGameBoardById.name
-      : null;
-  }
+  getBoardData = await gql.request<getBoardData, getBoardVariables>(GET_BOARD, {
+    id: boardId ? boardId : "",
+  });
+  existingRows = getBoardData?.findGameBoardById.rows;
+  result = getBoardData?.findGameBoardById.result
+    ? getBoardData?.findGameBoardById.result
+    : null;
+  name = getBoardData?.findGameBoardById.name
+    ? getBoardData?.findGameBoardById.name
+    : null;
 
   return {
     props: {
@@ -167,7 +136,6 @@ export const getServerSideProps: GetServerSideProps<
       board_id: boardId ? boardId : "",
       existingRows: existingRows,
       result: result,
-      newBoard: newBoard,
       name: name,
     },
   };

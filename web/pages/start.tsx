@@ -14,11 +14,11 @@ import {
   GQLClient,
 } from "../lib/graphQLClient";
 
-type GamePageProps = {
+type StartPageProps = {
   code: string;
 };
 
-export default function Home({ code }: GamePageProps) {
+export default function Start({ code }: StartPageProps) {
   const router = useRouter();
 
   const [isStartButtonDisabled, setStartButtonDisabled] =
@@ -157,7 +157,7 @@ export default function Home({ code }: GamePageProps) {
 }
 
 export const getServerSideProps: GetServerSideProps<
-  GamePageProps
+  StartPageProps
 > = async () => {
   const response = await fetch(
     "https://www.random.org/integers/?num=4&min=0&max=7&col=1&base=10&format=plain&rnd=new"
