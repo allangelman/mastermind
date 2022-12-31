@@ -15,6 +15,7 @@ export class GameBoardsService {
     let gameBoard = new GameBoard();
 
     gameBoard.game_id = createGameBoardInput.game_id;
+    gameBoard.name = createGameBoardInput.name;
     gameBoard = await this.gameBoardsRepository.save(gameBoard);
     return gameBoard;
   }
