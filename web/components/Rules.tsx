@@ -10,9 +10,11 @@ export const Rules = () => {
         </button>
       </Dialog.Trigger>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0" />
+        <Dialog.Overlay className="fixed inset-0 bg-slate-500" />
         <Dialog.Content className="w-[600px] p-4 flex flex-col justify-center space-y-2  bg-white border-2 border-black fixed top-[5%] outline-none rounded-lg left-[30%]">
-          <Dialog.Title className="flex justify-center">Rules</Dialog.Title>
+          <Dialog.Title className="flex justify-center">
+            <b>Rules</b>
+          </Dialog.Title>
           <Dialog.Description>
             1. A pattern of four random numbers is generated from a total of 8
             different numbers.
@@ -27,11 +29,14 @@ export const Rules = () => {
           </Dialog.Description>
           <Dialog.Description>
             4. (Multiplayer only) Race the other players to crack the code
-            first!
+            first! You will see the feedback the other players recieve in
+            real-time, so you will know how close they are to cracking the code
           </Dialog.Description>
           <Dialog.Description>
             <div className="flex flex-col items-center">
-              <span>Key</span>
+              <span>
+                <b>Key</b>
+              </span>
               <div className="flex flex-row space-x-4 items-center">
                 <span>Incorrect number</span>
                 <FeedbackCircle number={0} />
@@ -48,7 +53,9 @@ export const Rules = () => {
           </Dialog.Description>
           <Dialog.Description>
             <div className="flex flex-col items-center space-y-2">
-              <span>Examples</span>
+              <span>
+                <b>Examples</b>
+              </span>
               <span>Code: 0 1 3 5</span>
               <div className="flex flex-row space-x-4 items-center justify-center">
                 <span> Guess: 2 2 4 6</span>

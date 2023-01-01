@@ -8,6 +8,7 @@ import { Row } from "./Row";
 import { Options } from "./Options";
 import useClipboard from "react-use-clipboard";
 import { Rules } from "./Rules";
+import { Header } from "./Header";
 
 interface GameProps {
   board: GameBoardModel;
@@ -99,6 +100,8 @@ export const GameBoard = ({ board }: GameProps) => {
 
   return (
     <>
+      <Header isMultiplayer={!!query.multiplayer} />
+      <div className="flex justify-center">{board.code}</div>
       <div className=" mx-auto w-[800px] justify-center flex flex-row space-x-4">
         <div className="flex flex-col items-center w-[800px] space-y-2">
           <Rules />
@@ -109,7 +112,7 @@ export const GameBoard = ({ board }: GameProps) => {
                 className="h-10 rounded bg-green-300 px-2 hover:bg-green-500"
                 onClick={() => setGameCodeCopied()}
               >
-                {isGameCodeCopied ? "Copied!" : "Copy"}
+                {isGameCodeCopied ? "Copied!" : "Copy and share!"}
               </button>
             </div>
           )}

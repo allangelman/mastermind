@@ -16,6 +16,7 @@ import {
 import { StartPageButton } from "../components/StartPageButton";
 import { StartPageSeperator } from "../components/StartPageSeperator";
 import { StartPageInput } from "../components/StartPageInput";
+import { Rules } from "../components/Rules";
 
 type StartPageProps = {
   code: string;
@@ -72,8 +73,10 @@ export default function Start({ code }: StartPageProps) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Header />
+
       <div className="mx-auto w-[500px] flex flex-col items-center space-y-2">
+        <div className="text-2xl pt-8">Mastermind</div>
+        <div>Play the classic Mastermind: just you against the computer!</div>
         <StartPageButton
           onClick={async () => {
             setIsSinglePlayerLoading(true);
@@ -86,14 +89,20 @@ export default function Start({ code }: StartPageProps) {
             );
           }}
           loading={singlePlayerLoading}
-          text={"start single player"}
+          text={"Start single player game"}
         />
 
         <StartPageSeperator />
-
+        <div className="text-2xl">Mastermind Race</div>
+        <div>
+          Play Mastermind Race: compete with freinds to see who can crack the
+          code fastest! One person must start the game and then share the "game
+          code" with the rest of the players (game code available after game
+          started)
+        </div>
         <StartPageInput
           inputValue={inputNameStartValue}
-          label={"player name"}
+          label={"Player name"}
           onChange={(e) => {
             setInputNameStartValue(e.target.value);
           }}
@@ -112,21 +121,22 @@ export default function Start({ code }: StartPageProps) {
           }}
           disabled={isStartButtonDisabled}
           loading={multiPlayerLoading}
-          text={"start multi player"}
+          text={"Start multiplayer game"}
         />
-
-        <StartPageSeperator />
-
+        <div>
+          Once one person has started the game and shared the "game code", the
+          rest of the players can join the game here!
+        </div>
         <StartPageInput
           inputValue={inputNameJoinValue}
-          label={"player name"}
+          label={"Player name"}
           onChange={(e) => {
             setInputNameJoinValue(e.target.value);
           }}
         />
         <StartPageInput
           inputValue={inputGameJoinValue}
-          label={"game code"}
+          label={"Game code"}
           onChange={(e) => {
             setInputGameJoinValue(e.target.value);
           }}
@@ -143,8 +153,10 @@ export default function Start({ code }: StartPageProps) {
           }}
           disabled={isJoinButtonDisabled}
           loading={joinLoading}
-          text={"join multi player"}
+          text={"Join multiplayer game"}
         />
+        <StartPageSeperator />
+        <Rules />
       </div>
     </>
   );

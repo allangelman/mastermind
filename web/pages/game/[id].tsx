@@ -73,9 +73,6 @@ export default function GamePage({
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <Header />
-
-      <div className="flex justify-center">{code}</div>
       <GameBoard
         board={
           new GameBoardModel(
