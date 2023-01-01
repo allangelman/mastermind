@@ -46,7 +46,7 @@ export const Row = ({
         onClick={async () => {
           rowModel.setFeedback(rowModel.values);
           setFeedback(rowModel.feedback);
-          setGameResult(board.checkGameResult(rowModel.rowNumber));
+          setGameResult(board.getGameResult(rowModel.rowNumber));
           await rowModel.saveRow();
 
           board.incrementRound();

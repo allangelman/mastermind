@@ -1,4 +1,4 @@
-export class OtherFeedbackModel {
+export class CompetitorFeedbackModel {
   feedback: number[];
 
   constructor(feedback: number[]) {

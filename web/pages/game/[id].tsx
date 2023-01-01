@@ -24,7 +24,6 @@ type GamePageProps = {
   board_id: string;
   existingRows: existingRowData[];
   result?: GameResult | null;
-
   name?: string | null;
   multiplayerResult?: string;
 };
@@ -35,7 +34,6 @@ export default function GamePage({
   board_id,
   existingRows,
   result,
-
   name,
   multiplayerResult,
 }: GamePageProps) {

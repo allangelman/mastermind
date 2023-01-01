@@ -13,7 +13,7 @@ import {
   updateMultiGameResultData,
   updateMultiGameResultVariables,
 } from "../lib/graphQLClient";
-import { OtherBoardModel } from "./OtherBoardModel";
+import { CompetitorBoardModel } from "./CompetitorBoardModel";
 
 export type GameResult = "Won" | "Lost";
 
@@ -28,7 +28,7 @@ export class GameBoardModel {
   code: number[];
   gameId: string;
   existingRows: GameBoardRowModel[];
-  otherBoardData: OtherBoardModel[] = [];
+  otherBoardData: CompetitorBoardModel[] = [];
   name?: string;
   multiPlayerResult?: string;
   gql: GQLClient;
@@ -42,7 +42,6 @@ export class GameBoardModel {
     id: string,
     existingRows: GameBoardRowModel[],
     gameResult?: GameResult,
-
     name?: string,
     multiPlayerResult?: string
   ) {
@@ -86,7 +85,7 @@ export class GameBoardModel {
     return this.options.getCurrentOption();
   }
 
-  checkGameResult(rowNumber: number): GameResult | undefined {
+  getGameResult(rowNumber: number): GameResult | undefined {
     const rowFeedback = this.gameBoard[rowNumber].feedback;
     const wonState = [2, 2, 2, 2];
     const state = rowFeedback.every((val, index) => val === wonState[index]);
@@ -98,10 +97,12 @@ export class GameBoardModel {
       this.gameResult = "Lost";
       this.updateResult("Lost");
       return "Lost";
+    } else {
+      return undefined;
     }
   }
 
-  checkMultiPlayerGameResult(): string | undefined {
+  getMultiPlayerGameResult(): string | undefined {
     const resultsMap: Map<string, GameResult | ""> = new Map([]);
 
     resultsMap.set(
@@ -167,7 +168,7 @@ export class GameBoardModel {
     this.multiPlayerResult = result;
   }
 
-  async getOtherBoardFeedback(): Promise<OtherBoardModel[]> {
+  async getCompetitorBoards(): Promise<CompetitorBoardModel[]> {
     const getBoardData = await this.gql.request<
       getOtherBoardData,
       getOtherBoardVariables
@@ -180,7 +181,7 @@ export class GameBoardModel {
 
     const values = feedbackList.map(
       (data: otherBoardData) =>
-        new OtherBoardModel(data.id, data.rows, data.name, data.result)
+        new CompetitorBoardModel(data.id, data.rows, data.name, data.result)
     );
 
     this.otherBoardData = values;
