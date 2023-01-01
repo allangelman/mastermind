@@ -43,16 +43,19 @@ export const Row = ({
       <CheckButton
         rowNumber={rowModel.rowNumber}
         currentRound={currentRound}
-        onClick={() => {
+        onClick={async () => {
           rowModel.setFeedback(rowModel.values);
           setFeedback(rowModel.feedback);
           setGameResult(board.checkGameResult(rowModel.rowNumber));
-          rowModel.saveRow();
+          await rowModel.saveRow();
 
           board.incrementRound();
           setCurrentRound(board.currentRound);
         }}
-        disabled={board.gameResult !== undefined}
+        disabled={
+          board.gameResult !== undefined ||
+          board.multiPlayerResult !== undefined
+        }
       />
     </div>
   );

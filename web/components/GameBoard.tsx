@@ -53,45 +53,19 @@ export const GameBoard = ({ board }: GameProps) => {
 
       setOtherPlayerFeedback(otherPlayerBoards);
 
-      const resultsMap: Map<string, GameResult | ""> = new Map([]);
+      const multiGameResult = board.checkMultiPlayerGameResult();
+      setMultiPlayerGameResult(multiGameResult);
 
-      resultsMap.set(
-        board.name ?? "anon", //shouldn't ever be anon
-        board.gameResult ? board.gameResult : ""
-      );
-
-      otherPlayerBoards.forEach((otherBoard) => {
-        resultsMap.set(
-          otherBoard.name ?? "anon", //shouldn't ever be anon
-          otherBoard.result ? otherBoard.result : ""
-        );
-      });
-
-      let allPlayersLost = true;
-      let winner;
-      resultsMap.forEach((result, name) => {
-        if (result !== "Lost") {
-          allPlayersLost = false;
-        }
-        if (result === "Won") {
-          winner = name;
-        }
-      });
-      resultsMap.keys();
-
-      const multiplayerGameEnded = winner || allPlayersLost;
+      const multiplayerGameEnded = multiGameResult !== undefined;
 
       if (!multiplayerGameEnded) {
         setTimeout(pollOtherPlayerBoards, POLL_DELAY);
       } else {
-        if (winner) {
-          setMultiPlayerGameResult(`${winner} Won!`);
-          await board.updateMultiPlayerResult(`${winner} Won!`);
-        } else if (allPlayersLost) {
-          setMultiPlayerGameResult(`All lost!`);
-          await board.updateMultiPlayerResult(`All lost!`);
-        } else {
-          setMultiPlayerGameResult(undefined);
+        await board.updateMultiPlayerResult(multiGameResult);
+        board.setMultiPlayerResult(multiGameResult);
+        if (board.gameResult === undefined) {
+          board.decrementRound();
+          setCurrentRound(board.currentRound);
         }
         resolve();
       }
@@ -99,23 +73,25 @@ export const GameBoard = ({ board }: GameProps) => {
   };
 
   return (
-    <>
+    <div className="flex flex-col justify-center">
       <Header isMultiplayer={!!query.multiplayer} />
       <div className="flex justify-center">{board.code}</div>
-      <div className=" mx-auto w-[800px] justify-center flex flex-row space-x-4">
-        <div className="flex flex-col items-center w-[800px] space-y-2">
-          <Rules />
-          {query.multiplayer && (
-            <div className="flex flex-row space-x-2 items-center">
-              <div> Game code: {board.gameId} </div>
-              <button
-                className="h-10 rounded bg-green-300 px-2 hover:bg-green-500"
-                onClick={() => setGameCodeCopied()}
-              >
-                {isGameCodeCopied ? "Copied!" : "Copy and share!"}
-              </button>
-            </div>
-          )}
+      <div className="flex justify-center">
+        <Rules />
+      </div>
+      {query.multiplayer && (
+        <div className="flex flex-row space-x-2 items-center justify-center">
+          <div> Game code: {board.gameId} </div>
+          <button
+            className="h-10 rounded bg-green-300 px-2 hover:bg-green-500"
+            onClick={() => setGameCodeCopied()}
+          >
+            {isGameCodeCopied ? "Copied!" : "Copy and share!"}
+          </button>
+        </div>
+      )}
+      <div className="mx-auto w-[800px] justify-center flex flex-row space-x-4">
+        <div className="flex flex-col items-center space-y-2">
           <div>{board.name}</div>
           <div className="flex flex-col space-y-2">
             <>
@@ -160,6 +136,6 @@ export const GameBoard = ({ board }: GameProps) => {
             </>
           ))}
       </div>
-    </>
+    </div>
   );
 };

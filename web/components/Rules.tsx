@@ -5,7 +5,7 @@ export const Rules = () => {
   return (
     <Dialog.Root>
       <Dialog.Trigger asChild>
-        <button className="h-10 bg-blue-400 hover:bg-blue-600 rounded-lg px-2">
+        <button className="h-10 w-14 flex justify-center items-center bg-blue-400 hover:bg-blue-600 rounded-lg px-2">
           Rules
         </button>
       </Dialog.Trigger>

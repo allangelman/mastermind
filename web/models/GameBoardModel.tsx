@@ -28,7 +28,7 @@ export class GameBoardModel {
   code: number[];
   gameId: string;
   existingRows: GameBoardRowModel[];
-  otherBoardData?: OtherBoardModel;
+  otherBoardData: OtherBoardModel[] = [];
   name?: string;
   multiPlayerResult?: string;
   gql: GQLClient;
@@ -75,7 +75,11 @@ export class GameBoardModel {
   }
 
   incrementRound(): void {
-    if (!this.gameResult) this.currentRound += 1;
+    if (!this.gameResult && !this.multiPlayerResult) this.currentRound += 1;
+  }
+
+  decrementRound(): void {
+    this.currentRound -= 1;
   }
 
   getCurrentOption(): number {
@@ -95,6 +99,44 @@ export class GameBoardModel {
       this.updateResult("Lost");
       return "Lost";
     }
+  }
+
+  checkMultiPlayerGameResult(): string | undefined {
+    const resultsMap: Map<string, GameResult | ""> = new Map([]);
+
+    resultsMap.set(
+      this.name ?? "anon", //shouldn't ever be anon
+      this.gameResult ? this.gameResult : ""
+    );
+
+    this.otherBoardData.forEach((otherBoard) => {
+      resultsMap.set(
+        otherBoard.name ?? "anon", //shouldn't ever be anon
+        otherBoard.result ? otherBoard.result : ""
+      );
+    });
+
+    let allPlayersLost = true;
+    let winner;
+    resultsMap.forEach((result, name) => {
+      if (result !== "Lost") {
+        allPlayersLost = false;
+      }
+      if (result === "Won") {
+        winner = name;
+      }
+    });
+
+    let multiPlayerGameResult;
+    if (winner) {
+      multiPlayerGameResult = `${winner} Won!`;
+    } else if (allPlayersLost) {
+      multiPlayerGameResult = `All lost!`;
+    } else {
+      multiPlayerGameResult = undefined;
+    }
+
+    return multiPlayerGameResult;
   }
 
   async updateResult(result: string): Promise<void> {
@@ -121,6 +163,10 @@ export class GameBoardModel {
     });
   }
 
+  setMultiPlayerResult(result: string): void {
+    this.multiPlayerResult = result;
+  }
+
   async getOtherBoardFeedback(): Promise<OtherBoardModel[]> {
     const getBoardData = await this.gql.request<
       getOtherBoardData,
@@ -136,6 +182,8 @@ export class GameBoardModel {
       (data: otherBoardData) =>
         new OtherBoardModel(data.id, data.rows, data.name, data.result)
     );
+
+    this.otherBoardData = values;
 
     return values;
   }
