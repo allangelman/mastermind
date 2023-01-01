@@ -28,7 +28,7 @@ interface FeedbackCircleProps {
   number: number;
 }
 
-const FeedbackCircle = ({ number }: FeedbackCircleProps) => {
+export const FeedbackCircle = ({ number }: FeedbackCircleProps) => {
   return (
     <>
       <div

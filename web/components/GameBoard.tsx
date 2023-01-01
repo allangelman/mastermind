@@ -7,6 +7,7 @@ import { GameEnded } from "./GameEnded";
 import { Row } from "./Row";
 import { Options } from "./Options";
 import useClipboard from "react-use-clipboard";
+import { Rules } from "./Rules";
 
 interface GameProps {
   board: GameBoardModel;
@@ -100,6 +101,7 @@ export const GameBoard = ({ board }: GameProps) => {
     <>
       <div className=" mx-auto w-[800px] justify-center flex flex-row space-x-4">
         <div className="flex flex-col items-center w-[800px] space-y-2">
+          <Rules />
           {query.multiplayer && (
             <div className="flex flex-row space-x-2 items-center">
               <div> Game code: {board.gameId} </div>
