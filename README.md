@@ -78,8 +78,8 @@ classDiagram
 
 ```mermaid
 classDiagram
-games "1" --> "_" game_boards : has
-game_boards "1" --> "_" game_rows : has
+games "1" --> "*" game_boards : has
+game_boards "1" --> "*" game_rows : has
 
     class games {
         +uuid id
