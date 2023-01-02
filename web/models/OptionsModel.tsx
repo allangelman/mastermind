@@ -9,10 +9,6 @@ export class OptionsModel {
     }
   }
 
-  getOption(number: number): number {
-    return this.options[number];
-  }
-
   getCurrentOption(): number {
     return this.currentOption;
   }
