@@ -4,7 +4,7 @@ import { InputType, Field } from '@nestjs/graphql';
   description:
     'Provides the fields and values to used to updare the game board result.',
 })
-export class UpdateMultiPlayerResultInput {
+export class UpdateMultiplayerResultInput {
   @Field({ description: 'id' })
   id: string;
 
