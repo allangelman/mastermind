@@ -24,6 +24,19 @@ npm test
 
 ## Pages
 
+```mermaid
+sequenceDiagram
+    index.tsx getServerSideProps ->>+ random.org/integers: sends request for numbers
+    random.org/integers ->>+ index.tsx getServerSideProps: responds with numbers
+    index.tsx getServerSideProps ->>+ index.tsx Home: passes numbers
+    index.tsx Home ->>+ mastermind-api: sends requests to create game/board
+    mastermind-api ->>+ index.tsx Home: responds with game/board data
+    index.tsx Home ->>+ game/[id].tsx getServerSideProps: routes to
+    game/[id].tsx getServerSideProps ->>+ mastermind-api: sends request to get game/board
+    mastermind-api ->>+ game/[id].tsx getServerSideProps: respondes with game/board data
+    game/[id].tsx getServerSideProps ->>+ game/[id].tsx GamePage: passes game/board data
+```
+
 ## UI (next, react)
 
 ## Models
