@@ -78,6 +78,7 @@ classDiagram
 
 ```mermaid
 classDiagram
+direction LR
 games "1" --> "*" game_boards : has
 game_boards "1" --> "*" game_rows : has
 
