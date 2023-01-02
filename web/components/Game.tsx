@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { GameBoardModel, GameResult } from "../models/GameBoardModel";
+import { BoardModel, GameResult } from "../models/BoardModel";
 import { useRouter } from "next/router";
 import { CompetitorBoardModel } from "../models/CompetitorBoardModel";
 import { FeedbackSquare } from "./FeedbackSquare";
@@ -9,27 +9,30 @@ import { Options } from "./Options";
 import useClipboard from "react-use-clipboard";
 import { Rules } from "./Rules";
 import { Header } from "./Header";
+import { GameModel } from "../models/GameModel";
 
 interface GameProps {
-  board: GameBoardModel;
+  game: GameModel;
 }
 
 const POLL_DELAY = 1000;
 
-export const GameBoard = ({ board }: GameProps) => {
+export const Game = ({ game }: GameProps) => {
+  const board = game.board;
+
   const [currentRound, setCurrentRound] = useState<number>(board.currentRound);
   const [gameResult, setGameResult] = useState<GameResult | undefined>(
-    board.gameResult
+    board.result
   );
   const [multiPlayerGameResult, setMultiPlayerGameResult] = useState<
     string | undefined
-  >(board.multiPlayerResult);
+  >(game.multiPlayerResult);
 
   const [competitorBoards, setCompetitorBoards] = useState<
     CompetitorBoardModel[]
   >([]);
 
-  const [isGameCodeCopied, setGameCodeCopied] = useClipboard(board.gameId, {
+  const [isGameCodeCopied, setGameCodeCopied] = useClipboard(game.id, {
     successDuration: 3000,
   });
 
@@ -49,11 +52,11 @@ export const GameBoard = ({ board }: GameProps) => {
 
   const pollCompetitorBoards = async (): Promise<void> => {
     return new Promise<void>(async (resolve) => {
-      const competitorBoards = await board.getCompetitorBoards();
+      const competitorBoards = await game.getCompetitorBoards();
 
       setCompetitorBoards(competitorBoards);
 
-      const multiGameResult = board.getMultiPlayerGameResult();
+      const multiGameResult = game.getMultiPlayerGameResult();
       setMultiPlayerGameResult(multiGameResult);
 
       const multiplayerGameEnded = multiGameResult !== undefined;
@@ -61,9 +64,9 @@ export const GameBoard = ({ board }: GameProps) => {
       if (!multiplayerGameEnded) {
         setTimeout(pollCompetitorBoards, POLL_DELAY);
       } else {
-        await board.updateMultiPlayerResult(multiGameResult);
-        board.setMultiPlayerResult(multiGameResult);
-        if (board.gameResult === undefined) {
+        await game.updateMultiPlayerResult(multiGameResult);
+        game.setMultiPlayerResult(multiGameResult);
+        if (board.result === undefined) {
           board.decrementRound();
           setCurrentRound(board.currentRound);
         }
@@ -81,7 +84,7 @@ export const GameBoard = ({ board }: GameProps) => {
       </div>
       {query.multiplayer && (
         <div className="flex flex-row space-x-2 items-center justify-center">
-          <div> Game code: {board.gameId} </div>
+          <div> Game code: {game.id} </div>
           <button
             className="h-10 rounded bg-green-300 px-2 hover:bg-green-500"
             onClick={() => setGameCodeCopied()}
@@ -95,7 +98,7 @@ export const GameBoard = ({ board }: GameProps) => {
           <div>{board.name}</div>
           <div className="flex flex-col space-y-2">
             <>
-              {board.gameBoard.map((rowModel, i) => (
+              {board.rows.map((rowModel, i) => (
                 <Row
                   key={i}
                   rowModel={rowModel}
@@ -104,6 +107,10 @@ export const GameBoard = ({ board }: GameProps) => {
                   currentRound={currentRound}
                   setCurrentRound={setCurrentRound}
                   setGameResult={setGameResult}
+                  disabled={
+                    board.result !== undefined ||
+                    game.multiPlayerResult !== undefined
+                  }
                 />
               ))}
             </>

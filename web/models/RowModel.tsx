@@ -6,7 +6,7 @@ import {
   GQLClient,
 } from "../lib/graphQLClient";
 
-export class GameBoardRowModel {
+export class RowModel {
   rowNumber: number;
   code: number[];
   values: number[] = [];

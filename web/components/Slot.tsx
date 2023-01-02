@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { GameBoardRowModel } from "../models/GameBoardRowModel";
+import { RowModel } from "../models/RowModel";
 
 interface SlotProps {
   onClick: () => void;
-  rowModel: GameBoardRowModel;
+  rowModel: RowModel;
   colNumber: number;
   currentRound: number;
 }

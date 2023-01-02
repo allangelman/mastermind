@@ -1,12 +1,10 @@
 import { GetServerSideProps } from "next";
 import Head from "next/head";
-import { GameBoard } from "../../components/GameBoard";
-import { Header } from "../../components/Header";
-import { Options } from "../../components/Options";
+import { Game } from "../../components/Game";
 import { OptionsModel } from "../../models/OptionsModel";
 import { FeedbackModel } from "../../models/FeedbackModel";
-import { GameBoardRowModel } from "../../models/GameBoardRowModel";
-import { GameBoardModel, GameResult } from "../../models/GameBoardModel";
+import { RowModel } from "../../models/RowModel";
+import { BoardModel, GameResult } from "../../models/BoardModel";
 import {
   existingRowData,
   getBoardData,
@@ -17,6 +15,7 @@ import {
   GET_GAME,
   GQLClient,
 } from "../../lib/graphQLClient";
+import { GameModel } from "../../models/GameModel";
 
 type GamePageProps = {
   code: string;
@@ -52,7 +51,7 @@ export default function GamePage({
       code.split("").map((char) => parseInt(char))
     );
 
-    const row = new GameBoardRowModel(
+    const row = new RowModel(
       4,
       code.split("").map((char) => parseInt(char)),
       i,
@@ -63,6 +62,23 @@ export default function GamePage({
     existingRowsReady.push(row);
   }
 
+  const boardModel = new BoardModel(
+    4,
+    10,
+    options,
+    code.split("").map((char) => parseInt(char)),
+    board_id,
+    existingRowsReady,
+    result ? result : undefined,
+    name ? name : undefined
+  );
+
+  const gameModel = new GameModel(
+    game_id,
+    boardModel,
+    multiplayerResult ? multiplayerResult : undefined
+  );
+
   return (
     <>
       <Head>
@@ -71,22 +87,7 @@ export default function GamePage({
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <GameBoard
-        board={
-          new GameBoardModel(
-            4,
-            10,
-            options,
-            code.split("").map((char) => parseInt(char)),
-            game_id,
-            board_id,
-            existingRowsReady,
-            result ? result : undefined,
-            name ? name : undefined,
-            multiplayerResult ? multiplayerResult : undefined
-          )
-        }
-      />
+      <Game game={gameModel} />
     </>
   );
 }

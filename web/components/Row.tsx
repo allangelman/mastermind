@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction, useState } from "react";
-import { GameBoardModel, GameResult } from "../models/GameBoardModel";
-import { GameBoardRowModel } from "../models/GameBoardRowModel";
+import { BoardModel, GameResult } from "../models/BoardModel";
+import { RowModel } from "../models/RowModel";
 import { CheckButton } from "./CheckButton";
 import { FeedbackSquare } from "./FeedbackSquare";
 import { Slot } from "./Slot";
@@ -8,8 +8,9 @@ import { Slot } from "./Slot";
 interface RowProps {
   numSlots: number;
   currentRound: number;
-  rowModel: GameBoardRowModel;
-  board: GameBoardModel;
+  rowModel: RowModel;
+  board: BoardModel;
+  disabled: boolean;
   setCurrentRound: Dispatch<SetStateAction<number>>;
   setGameResult: Dispatch<SetStateAction<GameResult | undefined>>;
 }
@@ -19,6 +20,7 @@ export const Row = ({
   numSlots,
   currentRound,
   rowModel,
+  disabled,
   setCurrentRound,
   setGameResult,
 }: RowProps) => {
@@ -46,16 +48,13 @@ export const Row = ({
         onClick={async () => {
           rowModel.setFeedback(rowModel.values);
           setFeedback(rowModel.feedback);
-          setGameResult(board.getGameResult(rowModel.rowNumber));
+          setGameResult(board.getResult(rowModel.rowNumber));
           await rowModel.saveRow();
 
           board.incrementRound();
           setCurrentRound(board.currentRound);
         }}
-        disabled={
-          board.gameResult !== undefined ||
-          board.multiPlayerResult !== undefined
-        }
+        disabled={disabled}
       />
     </div>
   );
