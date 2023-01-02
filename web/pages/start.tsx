@@ -74,8 +74,8 @@ export default function Start({ code }: StartPageProps) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <div className="mx-auto w-[500px] flex flex-col items-center space-y-2">
-        <div className="text-2xl pt-8">Mastermind</div>
+      <div className="mx-auto w-[500px] flex flex-col mt-4 p-4 items-center rounded-lg border-2 border-blue-500 space-y-2">
+        <div className="text-2xl">Mastermind</div>
         <div>Play the classic Mastermind: just you against the computer!</div>
         <StartPageButton
           onClick={async () => {

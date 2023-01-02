@@ -10,7 +10,7 @@ export const Rules = () => {
         </button>
       </Dialog.Trigger>
       <Dialog.Portal>
-        <Dialog.Overlay className="fixed inset-0 bg-slate-500" />
+        <Dialog.Overlay className="fixed inset-0 bg-[#c6d6f9]" />
         <Dialog.Content className="w-[600px] p-4 flex flex-col justify-center space-y-2  bg-white border-2 border-black fixed top-[5%] outline-none rounded-lg left-[30%]">
           <Dialog.Title className="flex justify-center">
             <b>Rules</b>
@@ -20,17 +20,17 @@ export const Rules = () => {
             different numbers.
           </Dialog.Description>
           <Dialog.Description>
-            2. A player will have 10 attempts to guess the number combination
+            2. A player will have 10 attempts to guess the number combination.
           </Dialog.Description>
           <Dialog.Description>
             3. At the end of each guess, the computer will generate feedback
             indicating how many numbers were guessed correctly in value and how
-            many were guessed correctly in value and location
+            many were guessed correctly in value and location.
           </Dialog.Description>
           <Dialog.Description>
             4. (Multiplayer only) Race the other players to crack the code
             first! You will see the feedback the other players recieve in
-            real-time, so you will know how close they are to cracking the code
+            real-time, so you will know how close they are to cracking the code.
           </Dialog.Description>
           <Dialog.Description>
             <div className="flex flex-col items-center">
