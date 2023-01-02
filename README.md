@@ -76,6 +76,40 @@ classDiagram
 
 ## DB (postgres)
 
+```mermaid
+classDiagram
+games "1" --> "_" game_boards : has
+game_boards "1" --> "_" game_rows : has
+
+    class games {
+        +uuid id
+        +text code
+        +text? multiplayer_result
+        +timestamptz created_at
+    	+timestamptz updated_at
+    }
+
+    class game_boards {
+    	+uuid id
+        +uuid game_id
+    	+text? result
+    	+text? name
+        +timestamptz created_at
+    	+timestamptz updated_at
+    }
+
+    class game_rows {
+    	+uuid id
+        +uuid game_board_id
+        +integer row_num
+    	+text values
+    	+text feedback
+        +timestamptz created_at
+    	+timestamptz updated_at
+
+    }
+```
+
 # Extensions
 
 ## Persisting Game State
