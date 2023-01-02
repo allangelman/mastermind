@@ -1,7 +1,7 @@
 export class CompetitorFeedbackModel {
-  readonly feedback: number[];
+  readonly values: number[];
 
   constructor(feedback: number[]) {
-    this.feedback = feedback;
+    this.values = feedback;
   }
 }

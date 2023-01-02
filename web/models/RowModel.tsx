@@ -10,7 +10,7 @@ export class RowModel {
   readonly rowNumber: number;
   private readonly code: number[];
   readonly values: number[] = [];
-  private feedbackModel?: FeedbackModel;
+  private feedback?: FeedbackModel;
   private readonly gameBoardId: string;
 
   constructor(
@@ -26,7 +26,7 @@ export class RowModel {
     this.rowNumber = rowNumber;
 
     if (feedback) {
-      this.feedbackModel = feedback;
+      this.feedback = feedback;
     }
     if (values) {
       this.values = values;
@@ -45,17 +45,17 @@ export class RowModel {
         game_board_id: this.gameBoardId,
         row_num: this.rowNumber,
         values: this.values.join(""),
-        feedback: this.feedback.join(""),
+        feedback: this.feedbackValues.join(""),
       },
     });
   }
 
   setFeedback(guesses: number[]): void {
-    this.feedbackModel = new FeedbackModel(guesses, this.code);
+    this.feedback = new FeedbackModel(guesses, this.code);
   }
 
-  get feedback(): number[] {
-    return this.feedbackModel?.feedback ?? [0, 0, 0, 0];
+  get feedbackValues(): number[] {
+    return this.feedback?.values ?? [0, 0, 0, 0];
   }
 
   setSlot(col: number, value: number): void {

@@ -1,11 +1,11 @@
 export class OptionsModel {
   private currentOption: number = -1;
-  readonly options: number[];
+  readonly values: number[];
 
   constructor(numOptions: number) {
-    this.options = [];
+    this.values = [];
     for (let i = 0; i < numOptions; i++) {
-      this.options.push(i);
+      this.values.push(i);
     }
   }
 

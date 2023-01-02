@@ -1,10 +1,10 @@
 export class FeedbackModel {
-  feedback: number[];
+  values: number[];
   private readonly code: number[];
 
   constructor(guess: number[], code: number[]) {
     this.code = code;
-    this.feedback = this.feedbackFromGuess(guess);
+    this.values = this.feedbackFromGuess(guess);
   }
 
   private feedbackFromGuess(guess: number[]): number[] {

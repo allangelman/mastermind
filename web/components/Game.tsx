@@ -97,7 +97,7 @@ export const Game = ({ game }: GameProps) => {
           <div>{board.name}</div>
           <div className="flex flex-col space-y-2">
             <>
-              {board.rowModels.map((rowModel, i) => (
+              {board.rows.map((rowModel, i) => (
                 <Row
                   key={i}
                   rowModel={rowModel}
@@ -123,7 +123,7 @@ export const Game = ({ game }: GameProps) => {
           {multiPlayerGameResult && (
             <GameEnded message={multiPlayerGameResult} code={board.code} />
           )}
-          <Options optionsModel={board.optionsModel} />
+          <Options options={board.options} />
         </div>
         {query.multiplayer &&
           competitorBoards.map((competitorBoard, i) => (
@@ -131,9 +131,9 @@ export const Game = ({ game }: GameProps) => {
               <div key={`competitor-${i}`} className="flex flex-col">
                 <div key={`id-${i}`}>{competitorBoard.name}</div>
                 <div key={`feedback-${i}`} className="space-y-2 pt-2">
-                  {competitorBoard.rows.map((competitorFeedback, i) => (
+                  {competitorBoard.feedbacks.map((competitorFeedback, i) => (
                     <FeedbackSquare
-                      feedback={competitorFeedback.feedback}
+                      feedback={competitorFeedback.values}
                       className="items-center space-y-1 h-10"
                     />
                   ))}

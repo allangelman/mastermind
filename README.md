@@ -34,6 +34,8 @@ npm test
 
 # Code Structure
 
+## Pages
+
 ## UI (next, react)
 
 ## Models
@@ -49,12 +51,37 @@ The models are typescript classes responsible for instantiang objects and making
 - Options
 
 ```mermaid
-graph TD
-A[Christmas] -->|Get money| B(Go shopping)
-B --> C{Let me think}
-C -->|One| D[Laptop]
-C -->|Two| E[iPhone]
-C -->|Three| F[Car]
+classDiagram
+  direction LR
+  class GameModel {
+    -board : BoardModel
+    -competitorBoards: CompetitorBoardModel[]
+  }
+  class CompetitorBoardModel{
+    -feedbacks : CompetitorFeedbackModel[]
+  }
+  class CompetitorFeedbackModel{
+    -values : number[]
+  }
+  class OptionsModel{
+    -values : number[]
+  }
+  class BoardModel{
+    -rows : RowModel[]
+    -options : OptionsModel
+  }
+  class RowModel{
+    -feedback : FeedbackModel
+  }
+  class FeedbackModel{
+    -values : number[]
+  }
+  GameModel  --o  BoardModel
+  GameModel  --o  CompetitorBoardModel
+  BoardModel  --o  RowModel
+  BoardModel  --o  OptionsModel
+  RowModel  --o  FeedbackModel
+  CompetitorBoardModel  --o  CompetitorFeedbackModel
 ```
 
 ## API (graphql, nest)

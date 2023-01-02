@@ -1,29 +1,29 @@
 import { OptionsModel } from "../models/OptionsModel";
 
 interface OptionsProps {
-  optionsModel: OptionsModel;
+  options: OptionsModel;
 }
 
-export const Options = ({ optionsModel }: OptionsProps) => {
+export const Options = ({ options }: OptionsProps) => {
   return (
     <div className="mx-auto w-[400px]">
-      <Row optionsModel={optionsModel} />
+      <Row options={options} />
     </div>
   );
 };
 
 interface RowProps {
-  optionsModel: OptionsModel;
+  options: OptionsModel;
 }
 
-export const Row = ({ optionsModel }: RowProps) => {
+export const Row = ({ options }: RowProps) => {
   return (
     <div className="flex flex-row space-x-2 justify-center">
-      {optionsModel.options.map((number, i) => (
+      {options.values.map((number, i) => (
         <Slot
           key={i}
           value={number}
-          onClick={() => optionsModel.setCurrentOption(number)}
+          onClick={() => options.setCurrentOption(number)}
         />
       ))}
     </div>

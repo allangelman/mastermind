@@ -24,7 +24,7 @@ export const Row = ({
   setCurrentRound,
   setGameResult,
 }: RowProps) => {
-  const [feedback, setFeedback] = useState<number[]>(rowModel.feedback);
+  const [feedback, setFeedback] = useState<number[]>(rowModel.feedbackValues);
 
   return (
     <div className="flex flex-row space-x-3 justify-center items-center">
@@ -47,7 +47,7 @@ export const Row = ({
         currentRound={currentRound}
         onClick={async () => {
           rowModel.setFeedback(rowModel.values);
-          setFeedback(rowModel.feedback);
+          setFeedback(rowModel.feedbackValues);
           setGameResult(board.getResult(rowModel.rowNumber));
           await rowModel.saveRow();
 

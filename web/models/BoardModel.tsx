@@ -12,12 +12,12 @@ export type GameResult = "Won" | "Lost";
 export class BoardModel {
   readonly numSlots: number;
   private readonly numRows: number;
-  readonly optionsModel: OptionsModel;
+  readonly options: OptionsModel;
   readonly code: number[];
   readonly id: string;
   readonly existingRows: RowModel[];
   currentRound: number;
-  readonly rowModels: RowModel[];
+  readonly rows: RowModel[];
   result?: GameResult;
   readonly name?: string;
   private readonly gql: GQLClient;
@@ -36,9 +36,9 @@ export class BoardModel {
     this.id = id;
     this.code = code;
     this.numRows = numRows;
-    this.optionsModel = optionsModel;
+    this.options = optionsModel;
     this.currentRound = result ? existingRows.length - 1 : existingRows.length;
-    this.rowModels = [];
+    this.rows = [];
     this.existingRows = existingRows;
     this.result = result;
     this.name = name;
@@ -46,12 +46,12 @@ export class BoardModel {
 
     for (let i = 0; i < existingRows.length; i++) {
       const row = existingRows[i];
-      this.rowModels.push(row);
+      this.rows.push(row);
     }
 
     for (let i = existingRows.length; i < numRows; i++) {
       const row = new RowModel(this.numSlots, code, i, this.id);
-      this.rowModels.push(row);
+      this.rows.push(row);
     }
   }
 
@@ -64,11 +64,11 @@ export class BoardModel {
   }
 
   getCurrentOption(): number {
-    return this.optionsModel.getCurrentOption();
+    return this.options.getCurrentOption();
   }
 
   getResult(rowNumber: number): GameResult | undefined {
-    const rowFeedback = this.rowModels[rowNumber].feedback;
+    const rowFeedback = this.rows[rowNumber].feedbackValues;
     const wonState = [2, 2, 2, 2];
     const state = rowFeedback.every((val, index) => val === wonState[index]);
     if (state === true) {
