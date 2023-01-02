@@ -2,7 +2,7 @@ import { Resolver, Query, Mutation, Args, ID } from '@nestjs/graphql';
 import { GamesService } from './games.service';
 import { Game } from './entities/game.entity';
 import { CreateGameInput } from './dto/create-game.input';
-import { UpdateMultGameBoardInput } from './dto/update-game.input';
+import { UpdateMultiPlayerResultInput } from './dto/update-game.input';
 
 @Resolver(() => Game)
 export class GamesResolver {
@@ -23,13 +23,13 @@ export class GamesResolver {
   }
 
   @Mutation(() => Game)
-  updateMultiplayerGameResult(
-    @Args('updateMultGameBoardInput')
-    updateMultGameBoardInput: UpdateMultGameBoardInput,
+  updateMultiplayerResult(
+    @Args('updateMultiplayerResultInput')
+    updateMultiplayerResultInput: UpdateMultiPlayerResultInput,
   ): Promise<Game> {
     return this.gamesService.updateResult(
-      updateMultGameBoardInput.id,
-      updateMultGameBoardInput.multiplayer_result,
+      updateMultiplayerResultInput.id,
+      updateMultiplayerResultInput.multiplayer_result,
     );
   }
 }

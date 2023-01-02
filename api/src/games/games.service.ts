@@ -19,7 +19,7 @@ export class GamesService {
     return game;
   }
 
-  findOneById(id: string) {
+  async findOneById(id: string): Promise<Game> {
     return this.gamesRepository.findOneBy({ id });
   }
 

@@ -20,12 +20,14 @@ export class GameBoardsService {
     return gameBoard;
   }
 
-  //TODO:this should have return type
-  findOneById(id: string) {
+  async findOneById(id: string): Promise<GameBoard> {
     return this.gameBoardsRepository.findOneBy({ id });
   }
 
-  findBoardsByGameId(gameId: string, myBoardId: string): Promise<GameBoard[]> {
+  async findBoardsByGameId(
+    gameId: string,
+    myBoardId: string,
+  ): Promise<GameBoard[]> {
     return this.gameBoardsRepository.find({
       where: {
         game_id: gameId,

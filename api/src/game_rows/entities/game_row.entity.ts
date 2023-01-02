@@ -29,11 +29,11 @@ export class GameRow {
   @Column({ name: 'values' })
   values!: string;
 
-  @Field({ description: 'Creation timestamp of the game.' })
+  @Field({ description: 'Creation timestamp of the game row.' })
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   createdAt!: Date;
 
-  @Field({ description: 'Last updated timestamp of the game.' })
+  @Field({ description: 'Last updated timestamp of the game row.' })
   @UpdateDateColumn({ name: 'updated_at', type: 'timestamptz' })
   updatedAt!: Date;
 }

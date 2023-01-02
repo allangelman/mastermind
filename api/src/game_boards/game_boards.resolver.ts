@@ -45,8 +45,8 @@ export class GameBoardsResolver {
     return this.gameBoardsService.findOneById(id);
   }
 
-  @Query(() => [GameBoard], { name: 'findOtherPlayerGameBoards' })
-  findOtherPlayerGameBoards(
+  @Query(() => [GameBoard], { name: 'findCompetitorGameBoards' })
+  findCompetitorGameBoards(
     @Args('gameId', { type: () => ID, description: 'ID of the game.' })
     gameId: string,
     @Args('myBoardId', { type: () => ID, description: 'ID of the my board.' })
@@ -56,7 +56,7 @@ export class GameBoardsResolver {
   }
 
   @ResolveField(() => [GameRow], {
-    description: 'All workspaces a user belongs to.',
+    description: 'All rows of the game board.',
   })
   async rows(@Parent() parent: GameBoard): Promise<GameRow[]> {
     return this.gameRowsService.findByBoardId(parent.id);

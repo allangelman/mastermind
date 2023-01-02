@@ -9,7 +9,7 @@ import { UpdateDateColumn } from 'typeorm/decorator/columns/UpdateDateColumn';
 @ObjectType({ description: 'Represents information about a game board.' })
 @Entity('game_boards')
 export class GameBoard {
-  @Field(() => ID, { description: 'ID of the game.' })
+  @Field(() => ID, { description: 'ID of the game board.' })
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
@@ -25,11 +25,11 @@ export class GameBoard {
   @Column({ name: 'result', nullable: true })
   result?: string;
 
-  @Field({ description: 'Creation timestamp of the game.' })
+  @Field({ description: 'Creation timestamp of the game board.' })
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   createdAt!: Date;
 
-  @Field({ description: 'Last updated timestamp of the game.' })
+  @Field({ description: 'Last updated timestamp of the game board.' })
   @UpdateDateColumn({ name: 'updated_at', type: 'timestamptz' })
   updatedAt!: Date;
 }
