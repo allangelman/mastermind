@@ -32,8 +32,8 @@ export const FeedbackCircle = ({ number }: FeedbackCircleProps) => {
   return (
     <>
       <div
-        className={cn("w-2 h-2 rounded-full", {
-          "bg-slate-300": number === 0,
+        className={cn("w-2 h-2 rounded-full border border-black", {
+          "bg-slate-100": number === 0,
           "bg-red-500": number === 1,
           "bg-black": number === 2,
         })}
