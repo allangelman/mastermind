@@ -1,14 +1,14 @@
 import { BoardModel, GameResult } from "./BoardModel";
 import { CompetitorBoardModel } from "./CompetitorBoardModel";
 import {
-  getOtherBoardData,
-  getOtherBoardVariables,
-  GET_OTHER_BOARDS_FEEDBACK,
-  otherBoardData,
-  UPDATE_MULTI_GAME_RESULT,
-  updateMultiGameResultData,
-  updateMultiGameResultVariables,
   GQLClient,
+  CompetitorBoardData,
+  GET_COMPETITOR_BOARDS_FEEDBACK,
+  getCompetitorBoardVariables,
+  getCompetitorBoardData,
+  updateMultiplayerResultData,
+  updateMultiplayerResultVariables,
+  UPDATE_MULTIPLAYER_RESULT,
 } from "../lib/graphQLClient";
 
 export class GameModel {
@@ -66,10 +66,10 @@ export class GameModel {
 
   async updateMultiPlayerResult(result: string): Promise<void> {
     await this.gql.request<
-      updateMultiGameResultData,
-      updateMultiGameResultVariables
-    >(UPDATE_MULTI_GAME_RESULT, {
-      updateMultGameBoardInput: {
+      updateMultiplayerResultData,
+      updateMultiplayerResultVariables
+    >(UPDATE_MULTIPLAYER_RESULT, {
+      updateMultiplayerResultInput: {
         id: this.id,
         multiplayer_result: result,
       },
@@ -81,23 +81,21 @@ export class GameModel {
   }
 
   async getCompetitorBoards(): Promise<CompetitorBoardModel[]> {
-    const getBoardData = await this.gql.request<
-      getOtherBoardData,
-      getOtherBoardVariables
-    >(GET_OTHER_BOARDS_FEEDBACK, {
+    const getCompetitorBoardData = await this.gql.request<
+      getCompetitorBoardData,
+      getCompetitorBoardVariables
+    >(GET_COMPETITOR_BOARDS_FEEDBACK, {
       gameId: this.id,
       myBoardId: this.board.id,
     });
 
-    const feedbackList = getBoardData.findOtherPlayerGameBoards;
+    const competitorBoards = getCompetitorBoardData.findCompetitorGameBoards;
 
-    const values = feedbackList.map(
-      (data: otherBoardData) =>
+    this.competitorBoards = competitorBoards.map(
+      (data: CompetitorBoardData) =>
         new CompetitorBoardModel(data.id, data.rows, data.name, data.result)
     );
 
-    this.competitorBoards = values;
-
-    return values;
+    return this.competitorBoards;
   }
 }

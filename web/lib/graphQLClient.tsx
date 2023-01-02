@@ -77,9 +77,9 @@ export interface getBoardVariables {
   id: string;
 }
 
-export const GET_OTHER_BOARDS_FEEDBACK = gql`
-  query findOtherPlayerGameBoards($gameId: ID!, $myBoardId: ID!) {
-    findOtherPlayerGameBoards(gameId: $gameId, myBoardId: $myBoardId) {
+export const GET_COMPETITOR_BOARDS_FEEDBACK = gql`
+  query findCompetitorGameBoards($gameId: ID!, $myBoardId: ID!) {
+    findCompetitorGameBoards(gameId: $gameId, myBoardId: $myBoardId) {
       id
       result
       name
@@ -94,18 +94,18 @@ export interface rowFeedbackData {
   feedback: string;
 }
 
-export interface otherBoardData {
+export interface CompetitorBoardData {
   id: string;
   result?: "Won" | "Lost";
   name?: string;
   rows: rowFeedbackData[];
 }
 
-export interface getOtherBoardData {
-  findOtherPlayerGameBoards: otherBoardData[];
+export interface getCompetitorBoardData {
+  findCompetitorGameBoards: CompetitorBoardData[];
 }
 
-export interface getOtherBoardVariables {
+export interface getCompetitorBoardVariables {
   gameId: string;
   myBoardId: string;
 }
@@ -208,12 +208,12 @@ export interface updateBoardResultVariables {
   };
 }
 
-export const UPDATE_MULTI_GAME_RESULT = gql`
-  mutation updateMultiplayerGameResult(
-    $updateMultGameBoardInput: UpdateMultGameBoardInput!
+export const UPDATE_MULTIPLAYER_RESULT = gql`
+  mutation updateMultiplayerResult(
+    $updateMultiplayerResultInput: UpdateMultiplayerResultInput!
   ) {
-    updateMultiplayerGameResult(
-      updateMultGameBoardInput: $updateMultGameBoardInput
+    updateMultiplayerResult(
+      updateMultiplayerResultInput: $updateMultiplayerResultInput
     ) {
       id
       multiplayer_result
@@ -221,15 +221,15 @@ export const UPDATE_MULTI_GAME_RESULT = gql`
   }
 `;
 
-export interface updateMultiGameResultData {
-  updateMultiplayerGameResult: {
+export interface updateMultiplayerResultData {
+  updateMultiplayerResult: {
     multiplayer_result: string;
     id: string;
   };
 }
 
-export interface updateMultiGameResultVariables {
-  updateMultGameBoardInput: {
+export interface updateMultiplayerResultVariables {
+  updateMultiplayerResultInput: {
     id: string;
     multiplayer_result: string;
   };
