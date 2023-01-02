@@ -12,11 +12,11 @@ import {
 } from "../lib/graphQLClient";
 
 export class GameModel {
-  board: BoardModel;
-  competitorBoards: CompetitorBoardModel[] = [];
-  id: string;
+  readonly board: BoardModel;
+  private competitorBoards: CompetitorBoardModel[] = [];
+  readonly id: string;
   multiPlayerResult?: string;
-  gql: GQLClient;
+  private readonly gql: GQLClient;
 
   constructor(id: string, gameBoard: BoardModel, multiPlayerResult?: string) {
     this.id = id;
@@ -61,6 +61,7 @@ export class GameModel {
       multiPlayerGameResult = undefined;
     }
 
+    this.multiPlayerResult = multiPlayerGameResult;
     return multiPlayerGameResult;
   }
 
@@ -74,10 +75,6 @@ export class GameModel {
         multiplayer_result: result,
       },
     });
-  }
-
-  setMultiPlayerResult(result: string): void {
-    this.multiPlayerResult = result;
   }
 
   async getCompetitorBoards(): Promise<CompetitorBoardModel[]> {

@@ -2,10 +2,10 @@ import { rowFeedbackData } from "../lib/graphQLClient";
 import { CompetitorFeedbackModel } from "./CompetitorFeedbackModel";
 
 export class CompetitorBoardModel {
-  id: string;
-  result?: "Won" | "Lost";
-  rows: CompetitorFeedbackModel[];
-  name?: string;
+  private readonly id: string;
+  readonly result?: "Won" | "Lost";
+  readonly rows: CompetitorFeedbackModel[];
+  readonly name?: string;
 
   constructor(
     id: string,
@@ -17,9 +17,9 @@ export class CompetitorBoardModel {
     this.name = name;
     this.result = result;
     this.rows = rows.map(
-      (feedbak: rowFeedbackData) =>
+      (feedbackData: rowFeedbackData) =>
         new CompetitorFeedbackModel(
-          feedbak.feedback.split("").map((char: string) => parseInt(char))
+          feedbackData.feedback.split("").map((char: string) => parseInt(char))
         )
     );
   }

@@ -7,11 +7,11 @@ import {
 } from "../lib/graphQLClient";
 
 export class RowModel {
-  rowNumber: number;
-  code: number[];
-  values: number[] = [];
-  feedbackModel?: FeedbackModel;
-  gameBoardId: string;
+  readonly rowNumber: number;
+  private readonly code: number[];
+  readonly values: number[] = [];
+  private feedbackModel?: FeedbackModel;
+  private readonly gameBoardId: string;
 
   constructor(
     numSlots: number,
@@ -55,7 +55,7 @@ export class RowModel {
   }
 
   get feedback(): number[] {
-    return this.feedbackModel?.getFeedback() ?? [0, 0, 0, 0];
+    return this.feedbackModel?.feedback ?? [0, 0, 0, 0];
   }
 
   setSlot(col: number, value: number): void {

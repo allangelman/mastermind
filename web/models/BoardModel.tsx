@@ -10,22 +10,22 @@ import {
 export type GameResult = "Won" | "Lost";
 
 export class BoardModel {
-  readonly options: OptionsModel;
   readonly numSlots: number;
+  private readonly numRows: number;
+  readonly optionsModel: OptionsModel;
+  readonly code: number[];
+  readonly id: string;
+  readonly existingRows: RowModel[];
   currentRound: number;
-  rows: RowModel[];
-  id: string;
+  readonly rowModels: RowModel[];
   result?: GameResult;
-  numRows: number;
-  code: number[];
-  existingRows: RowModel[];
-  name?: string;
-  gql: GQLClient;
+  readonly name?: string;
+  private readonly gql: GQLClient;
 
   constructor(
     numSlots: number,
     numRows: number,
-    options: OptionsModel,
+    optionsModel: OptionsModel,
     code: number[],
     id: string,
     existingRows: RowModel[],
@@ -36,23 +36,22 @@ export class BoardModel {
     this.id = id;
     this.code = code;
     this.numRows = numRows;
-    this.options = options;
+    this.optionsModel = optionsModel;
     this.currentRound = result ? existingRows.length - 1 : existingRows.length;
-    this.rows = [];
+    this.rowModels = [];
     this.existingRows = existingRows;
     this.result = result;
-
     this.name = name;
     this.gql = new GQLClient();
 
     for (let i = 0; i < existingRows.length; i++) {
       const row = existingRows[i];
-      this.rows.push(row);
+      this.rowModels.push(row);
     }
 
     for (let i = existingRows.length; i < numRows; i++) {
       const row = new RowModel(this.numSlots, code, i, this.id);
-      this.rows.push(row);
+      this.rowModels.push(row);
     }
   }
 
@@ -65,11 +64,11 @@ export class BoardModel {
   }
 
   getCurrentOption(): number {
-    return this.options.getCurrentOption();
+    return this.optionsModel.getCurrentOption();
   }
 
   getResult(rowNumber: number): GameResult | undefined {
-    const rowFeedback = this.rows[rowNumber].feedback;
+    const rowFeedback = this.rowModels[rowNumber].feedback;
     const wonState = [2, 2, 2, 2];
     const state = rowFeedback.every((val, index) => val === wonState[index]);
     if (state === true) {
@@ -85,7 +84,7 @@ export class BoardModel {
     }
   }
 
-  async updateResult(result: string): Promise<void> {
+  private async updateResult(result: string): Promise<void> {
     await this.gql.request<updateBoardResultData, updateBoardResultVariables>(
       UPDATE_GAME_RESULT,
       {

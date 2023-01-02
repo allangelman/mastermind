@@ -1,6 +1,6 @@
 export class FeedbackModel {
   feedback: number[];
-  code: number[];
+  private readonly code: number[];
 
   constructor(guess: number[], code: number[]) {
     this.code = code;
@@ -48,9 +48,5 @@ export class FeedbackModel {
     }
 
     return feedback;
-  }
-
-  getFeedback(): number[] {
-    return this.feedback;
   }
 }

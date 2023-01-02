@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { BoardModel, GameResult } from "../models/BoardModel";
+import { GameResult } from "../models/BoardModel";
 import { useRouter } from "next/router";
 import { CompetitorBoardModel } from "../models/CompetitorBoardModel";
 import { FeedbackSquare } from "./FeedbackSquare";
@@ -56,16 +56,15 @@ export const Game = ({ game }: GameProps) => {
 
       setCompetitorBoards(competitorBoards);
 
-      const multiGameResult = game.getMultiPlayerGameResult();
-      setMultiPlayerGameResult(multiGameResult);
+      const multiPlayerResult = game.getMultiPlayerGameResult();
+      setMultiPlayerGameResult(multiPlayerResult);
 
-      const multiplayerGameEnded = multiGameResult !== undefined;
+      const multiplayerGameEnded = multiPlayerResult !== undefined;
 
       if (!multiplayerGameEnded) {
         setTimeout(pollCompetitorBoards, POLL_DELAY);
       } else {
-        await game.updateMultiPlayerResult(multiGameResult);
-        game.setMultiPlayerResult(multiGameResult);
+        await game.updateMultiPlayerResult(multiPlayerResult);
         if (board.result === undefined) {
           board.decrementRound();
           setCurrentRound(board.currentRound);
@@ -98,7 +97,7 @@ export const Game = ({ game }: GameProps) => {
           <div>{board.name}</div>
           <div className="flex flex-col space-y-2">
             <>
-              {board.rows.map((rowModel, i) => (
+              {board.rowModels.map((rowModel, i) => (
                 <Row
                   key={i}
                   rowModel={rowModel}
@@ -124,7 +123,7 @@ export const Game = ({ game }: GameProps) => {
           {multiPlayerGameResult && (
             <GameEnded message={multiPlayerGameResult} code={board.code} />
           )}
-          <Options options={board.options} />
+          <Options optionsModel={board.optionsModel} />
         </div>
         {query.multiplayer &&
           competitorBoards.map((competitorBoard, i) => (
