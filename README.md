@@ -38,6 +38,25 @@ npm test
 
 ## Models
 
+The models are typescript classes responsible for instantiang objects and making graphql queries and mutations
+
+- Game
+- Board
+- Row
+- Feedback
+- CompetitorBoard
+- CompetitorFeedback
+- Options
+
+```mermaid
+graph TD
+A[Christmas] -->|Get money| B(Go shopping)
+B --> C{Let me think}
+C -->|One| D[Laptop]
+C -->|Two| E[iPhone]
+C -->|Three| F[Car]
+```
+
 ## API (graphql, nest)
 
 ## DB (postgres)
