@@ -165,6 +165,8 @@ game_boards "1" --> "*" game_rows : has
 
 The first extension I implemented was persisting the game state. This was achieved by creating my database and API as described above, and setting up my games/[id].tsx page to query the game and game board.
 
+https://user-images.githubusercontent.com/45411265/210295929-97681bf2-bc6b-45b9-9be6-305ae32015a2.mov
+
 ## Multiplayer
 
 The next extension I implemented was multiplayer functionality. This was achieved by creating queries to get competitor game boards.
@@ -194,3 +196,6 @@ sequenceDiagram
 ## Things I learned
 
 - Mastermind
+
+
+
