@@ -12,7 +12,7 @@ To run my code locally, you can clone my repository, cd into the `web` folder , 
 npm run dev
 ```
 
-To run my test cases, you can run
+To run my test cases for the feedback logic, you can run
 
 ```
 npm test
@@ -20,19 +20,19 @@ npm test
 
 # Development Process
 
-The first step in my process was to do research into the game Mastermind, since I hadn't heard of this game before. I looked into some online verisions of the game to get familiar with the UI and how the game worked.
+The first step in my process was to do research into the game Mastermind. I looked into some online verisions of the game to get familiar with typical UIs and how the game worked.
 
-Once that was done, I started my coding process. One of the first decisions I made when working on this project was to use React, since I have used it extensively in my current job and knew I get could something working quickly. I also chose to use Next.js as my react framework. Once I opened my repo, created my Next application, I got started making simple react components for my mastermind game board.
+Once that was done, I started my coding process. One of the first decisions I made when working on this project was to use React, since I am fairly comfortable with it and wanted to get the UI done quickly. I also chose to use Next.js as my react framework. Once I opened my repo, created my Next application, I got started making simple react components for my Mastermind game board.
 
-I initially considered just using react state to keep track of the game, but quickly realized I needed a layer behind the UI to store the game. So I created my Models, which were typescript classes to represent the various aspects of the mastermind board.
+I initially considered just using react state to keep track of the game, but quickly realized I needed a layer behind the UI to store all the game logic. So I created my models, which were Typescript classes to represent the various aspects of the mastermind board.
 
-Once I was done with that, I decided I wanted to deploy my site, and Vercel (company that makes Next.js) has an easy way to deploy a Next.js site, so I went with that.
+Once I was done with that, I decided I wanted to deploy my site, and [Vercel](https://vercel.com/) has an easy way to deploy a Next.js site, so I went with that.
 
-When thinking of what extensions I wanted to add to my game, the first idea I had was to use a database and API to store the game state of boards. This would allow users to maintain their in-progress game even if they refresh. I also knew at this point that if I had time, I would also want to try to incorporate some multiplayer aspect as an addtional extension, so I kept that in mind as I went ahead to make my API and database.
+When thinking of what extensions I wanted to add to my game, the first idea I had was to use a database and API to store the game state of board. This would allow users to maintain their in-progress game even if they refresh. I also knew at this point that if I had time, I would also want to try to incorporate some multiplayer aspect as an addtional extension, so I kept that in mind as I went ahead to make my API and database.
 
-I decided to use Render as my service to host my API and database. First I created my database through Render, and connected to it through SQLPro for Postgres.
+I decided to use [Render](https://render.com/) as my service to host my API and database. First I created my database through Render, and connected to it through my PostgresSQL database client of choice, SQLPro for Postgres.
 
-For my API that would communicate with my database, I made a Nest.js application and chose to go with the GraphQL code-first apporach (the schema is generated after code is written).
+For my API that would communicate with my database, I chose to use [Nest.js](https://docs.nestjs.com/) since it has built in Typescript support. I made my project and chose to go with the GraphQL code-first apporach (explained further below).
 
 I ran into some challenges when getting my API to run successfully on render.
 
@@ -44,18 +44,9 @@ Here is an diagram with an overview of my code structure. I used React for my UI
 
 ```mermaid
 graph TD
-    A("UI (React)") --> B("Models (Typescript classes)")
-    B --> |GraphQL| C("API")
+    A("UI (Next.js/React)") --> B("Models (Typescript classes)")
+    B --> |GraphQL| C("API (Nest.js/GraphQL)")
     C -->|TypeORM| D("Database (PostgreSQL)")
-
-    subgraph Next.js
-        A
-        B
-    end
-
-    subgraph Nest.js
-        C
-    end
 ```
 
 ## What happens when you first load the site?
@@ -77,11 +68,11 @@ sequenceDiagram
 
 ## UI
 
-I used React and tailwind for my UI. My approach to the UI was to seperate out the UI into as granular components as possible and to place each of those components into its own file to maintain code organization. I also used Radix Dialog to create the "Rules" modal.
+I used React and [Tailwind](https://tailwindcss.com/) for my UI. My approach to the UI was to seperate out the UI into as granular components as possible and to place each of those components into its own file to maintain code organization. I also used the [Radix Dialog](https://www.radix-ui.com/docs/primitives/components/dialog) to create the "Rules" modal.
 
 ## Models
 
-The models are typescript classes responsible for instantiang objects and making graphql queries and mutations. Here is a diagram of all the classes I made and their relationship to eachother. I chose to use aggregation so I could represent the "has a" porperty of my classes.
+The models are typescript classes responsible for instantiang objects and making graphql queries and mutations. Here is a diagram of all the classes I made and their relationship to each other. I chose to use aggregation so I could represent the "has a" porperty of my classes. For example, the game "has a" board and the board "has a" list of rows.
 
 ```mermaid
 classDiagram
@@ -119,7 +110,7 @@ classDiagram
 
 ## API
 
-For my API, I used Nest.js, and chose to use GraphQL to define queries and mutations, and TypeORM to connect to my database.
+For my API, I used [Nest.js](https://nestjs.com/), and chose to use GraphQL to define queries and mutations, and TypeORM to connect to my database. If using GraphQL with Nest.js, you can choose between a code-first or schema first approach (described [here](https://docs.nestjs.com/graphql/quick-start#overview)). I choose code-first, as it allowed me to work in Typescript on both the front-end and back-end.
 
 I created resources corresponding to each of my database tables:
 
