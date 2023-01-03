@@ -194,6 +194,8 @@ game_boards "1" --> "*" game_rows : has
 
 The first extension I implemented was persisting the game state. This was achieved by creating my database and API as described above, and setting up my games/[id].tsx page to query the game and game board.
 
+https://user-images.githubusercontent.com/45411265/210295929-97681bf2-bc6b-45b9-9be6-305ae32015a2.mov
+
 ## Multiplayer
 
 The next extension I implemented was multiplayer functionality. This was achieved by creating queries to get competitor game boards.
@@ -201,6 +203,10 @@ The next extension I implemented was multiplayer functionality. This was achieve
 Intially I wanted to use web sockets, specifically the library [socket.io](https://socket.io/) to create the realtime updates between two players. I got a basic version with socket.io working locally, but after looking into it, I realized that [Vercel doesn't support web sockets](https://vercel.com/guides/do-vercel-serverless-functions-support-websocket-connections).
 
 So I chose to instead use polling to continuosly query the compeitor game boards until the multiplayer game result is updated. Polling starts as soon as the player creates or joins a multiplayer game, and it finishes as soon as one player wins or every player looses. Here is a diagram showing how the polling is working.
+
+
+https://user-images.githubusercontent.com/45411265/210296790-11d05aab-cbab-4b51-8d09-5af26d207a23.mov
+
 
 ```mermaid
 sequenceDiagram
@@ -223,3 +229,6 @@ sequenceDiagram
 ## Things I learned
 
 - Mastermind
+
+
+
