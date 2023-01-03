@@ -192,7 +192,9 @@ game_boards "1" --> "*" game_rows : has
 
 ## Persisting Game State
 
-The first extension I implemented was persisting the game state. This was achieved by creating my database and API as described above, and setting up my games/[id].tsx page to query the game and game board.
+The first extension I implemented was persisting the game state. This was achieved by creating my database and API as described above, and setting up my games/[id].tsx page to query the game and game board, so every time the user refreshes the board is quered and populated with the data.
+
+Here is a video of the persisting game state feature!
 
 https://user-images.githubusercontent.com/45411265/210295929-97681bf2-bc6b-45b9-9be6-305ae32015a2.mov
 
@@ -204,10 +206,6 @@ Intially I wanted to use web sockets, specifically the library [socket.io](https
 
 So I chose to instead use polling to continuosly query the compeitor game boards until the multiplayer game result is updated. Polling starts as soon as the player creates or joins a multiplayer game, and it finishes as soon as one player wins or every player looses. Here is a diagram showing how the polling is working.
 
-
-https://user-images.githubusercontent.com/45411265/210296790-11d05aab-cbab-4b51-8d09-5af26d207a23.mov
-
-
 ```mermaid
 sequenceDiagram
     loop until multiPlayerResult !== undefined
@@ -217,18 +215,24 @@ sequenceDiagram
     end
 ```
 
+Here is a video of the multiplayer feature!
+
+https://user-images.githubusercontent.com/45411265/210296790-11d05aab-cbab-4b51-8d09-5af26d207a23.mov
+
 # Reflections
 
 ## Known bugs / desired improvmenets
 
-- game_boards table needs to have a unique constraint on the name
-- the game_rows table needs a unique pair contraint between the game_board_id and row_num
-- Set up my developmenet environement more so i have a local db and local api... maybe use and learn docker more.
-- first time you load the game
+- If two players with the same name enter one game, the multiplayer game result won't be updated correctly since I am used a dictionary to compute that value, which relies on unique keys. The solution would be to enforce a unique constraint on the name column in the game_boards table and then have error handeling on the front end. Another solution would be to implement login and store player information in it's own table.
+- If you open the same game in two browsers and update the rows, and then refresh, the board will be loaded with all the rows from both games. The solution would be to enforce a unique contraint on the game_rows table between the game_board_id and row_num columns. In other words, it should not be allowed to have two game_row entries both with a row_num of 1 and both with the same game_board_id. Once the unique constraint is enforced, then there should also be error handeling on the front end. Another possiblity would be to optomistically update the row and upon any error, the row falls back to the empty state.
+- I noticed sometimes, the first time I click of one the start game buttons on the inital page, it takes a while for the game page to load. I believe this is because of the way I have it set up where the game and board are created on the index.tsx page and then queried again in the [id].tsx page as I described in the above diagram.
+- I currently represent the default board values as -1 values which I render as dark gray on the frontend. I also allow users to submit checks even if they did not fill out all the number values. If someone submits a row without all the numbers inputted and then refresh, the -1 values get saved into the database, and get parsed incorrectly on the frontend when the data loads in.
+- When I was working on setting up my development environment, I time boxed it, and decided to just made a production database and production API. I was running into errors when trying to run my local API, so I decided to just punt on that issue. I think ideally, I maybe would have even looked into setting up my developmenet environement with Docker.
 
 ## Things I learned
 
-- Mastermind
+Overall this was a really fun and challenging project to work on! Here are some of the things I learned
 
-
-
+- Web sockets are a great way to allow realtime communication and not as difficult to implement as I thought. But they do not work on Vercel
+- Implementing complex game logic is immensly easier with test driven development! I was running into issues initially when impelenting the algothm to figure out the feedback based on guesses, and creating test cases made the process much more smooth.
+- Using `private` and `readonly` when making classes helps ensure what can be accessed
