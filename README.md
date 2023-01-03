@@ -20,23 +20,23 @@ npm test
 
 # Development Process
 
-The first step in my process was to do research into the game Mastermind. I looked into some online verisions of the game to get familiar with typical UIs and how the game worked.
+1. <ins>Research</ins>: The first step in my process was to do research into the game Mastermind. I looked into some online verisions of the game to get familiar with typical UIs and how the game worked.
 
-Once that was done, I started my coding process. One of the first decisions I made when working on this project was to use React, since I am fairly comfortable with it and wanted to get the UI done quickly. I also chose to use Next.js as my react framework. Once I opened my repo, created my Next application, I got started making simple react components for my Mastermind game board.
+2. <ins>UI</ins>: Once that was done, I started my coding process. One of the first decisions I made when working on this project was to use React, since I am fairly comfortable with it and wanted to get the UI done quickly. I also chose to use Next.js as my react framework. Once I opened my repo, created my Next application, I got started making simple react components for my Mastermind game board.
 
-I initially considered just using react state to keep track of the game, but quickly realized I needed a layer behind the UI to store all the game logic. So I created my models, which were Typescript classes to represent the various aspects of the mastermind board.
+3. <ins>Game logic</ins>: I initially considered just using react state to keep track of the game, but quickly realized I needed a layer behind the UI to store all the game logic. So I created my models, which were Typescript classes to represent the various aspects of the mastermind board.
 
-Once I was done with that, I decided I wanted to deploy my site, and [Vercel](https://vercel.com/) has an easy way to deploy a Next.js site, so I went with that.
+4. <ins>Deploy frontend</ins>: Once I was done with that, I decided I wanted to deploy my site, and [Vercel](https://vercel.com/) has an easy way to deploy a Next.js site, so I went with that.
 
-When thinking of what extensions I wanted to add to my game, the first idea I had was to use a database and API to store the game state of board. This would allow users to maintain their in-progress game even if they refresh. I also knew at this point that if I had time, I would also want to try to incorporate some multiplayer aspect as an addtional extension, so I kept that in mind as I went ahead to make my API and database.
+5. <ins>API Planning</ins>: When thinking of what extensions I wanted to add to my game, the first idea I had was to use a database and API to store the game state of board. This would allow users to maintain their in-progress game even if they refresh. I also knew at this point that if I had time, I would also want to try to incorporate some multiplayer aspect as an addtional extension, so I kept that in mind as I went ahead to make my API and database.
 
-I decided to use [Render](https://render.com/) as my service to host my API and database. First I created my database through Render, and connected to it through my PostgresSQL database client of choice, SQLPro for Postgres.
+6. <ins>Created DB</ins>: I decided to use [Render](https://render.com/) as my service to host my API and database. First I created my database through Render, and connected to it through my PostgresSQL database client of choice, SQLPro for Postgres. Through SQLPro, I created by databases, and kept track of all the SQL queries I wrote in the `migrations` folder.
 
-For my API that would communicate with my database, I chose to use [Nest.js](https://docs.nestjs.com/) since it has built in Typescript support. I made my project and chose to go with the GraphQL code-first apporach (explained further below).
+7. <ins>Created API</ins>: For my API that would communicate with my database, I chose to use [Nest.js](https://docs.nestjs.com/) since it has built in Typescript support. I made my project and chose to go with the GraphQL code-first apporach (explained further below). From there I made the resources using [Nest.js CRUD generator](https://docs.nestjs.com/recipes/crud-generator). This creates boiler plate code, like service and resolver files, which I then was able to fill in with the nessecary queries and mutations I wanted.
 
-I ran into some challenges when getting my API to run successfully on render.
+8. <ins>Brainstormed multiplayer</ins>: Once I had state persistance working, I had to brainstorm how I would want my multiplayer functionality to work. Inspired by [Jackbox games](https://www.jackboxgames.com/), where one person shares a game code with the rest of the players, I decided I could use a similar approach, where the UUID of the game would be the code!
 
-I got it working in production, but I ran into an error where my local api couldn't connect to my database. So I ended up deciding to time box that issue just to not be held up so I make sure to have time to finsih the other aspects of the project.
+9. <ins>Implemented multiplayer</ins>: Once I had that idea secured, I worked on implemnting the idea. This is described in more detail below in the Extensions section!
 
 # Code Structure
 
@@ -112,11 +112,40 @@ classDiagram
 
 For my API, I used [Nest.js](https://nestjs.com/), and chose to use GraphQL to define queries and mutations, and TypeORM to connect to my database. If using GraphQL with Nest.js, you can choose between a code-first or schema first approach (described [here](https://docs.nestjs.com/graphql/quick-start#overview)). I choose code-first, as it allowed me to work in Typescript on both the front-end and back-end.
 
-I created resources corresponding to each of my database tables:
+I created resources corresponding to each of my database tables. Here is a list of the queries and mutations defined on each resource:
 
 - games
+
+  - createGame
+  - findGameById
+  - updateMultiplayerResult
+
 - games_boards
+
+  - createGameBoard
+  - updateGameResult
+  - findGameBoardById
+  - findCompetitorGameBoards
+
 - game_rows
+  - createGameRow
+  - findGameRowById
+
+I also included a rows `@ResolveField` on game_boards which allowed me to query all the rows of the board when doing the `findGameBoardById` and `findCompetitorGameBoards` queries
+
+```
+query findGameBoardById($id: ID!) {
+    findGameBoardById(id: $id) {
+      result
+      name
+      rows {
+        row_num
+        values
+        id
+      }
+    }
+  }
+```
 
 ## Database (postgres)
 
@@ -169,9 +198,9 @@ The first extension I implemented was persisting the game state. This was achiev
 
 The next extension I implemented was multiplayer functionality. This was achieved by creating queries to get competitor game boards.
 
-Intially I wanted to use web sockets, specifically the library socket.io to create the realtime updates between two players. I got a basic version with socket.io working locally, but after looking into it, I realized that Vercel doesn't work with web sockets in production.
+Intially I wanted to use web sockets, specifically the library [socket.io](https://socket.io/) to create the realtime updates between two players. I got a basic version with socket.io working locally, but after looking into it, I realized that [Vercel doesn't support web sockets](https://vercel.com/guides/do-vercel-serverless-functions-support-websocket-connections).
 
-So I chose to instead use polling, a technique to periodically send query at a given interval until a condition is met. Polling starts as soon as the player creates or joins a multiplayer game, and it finishes as soon as one player wins or every player looses.
+So I chose to instead use polling to continuosly query the compeitor game boards until the multiplayer game result is updated. Polling starts as soon as the player creates or joins a multiplayer game, and it finishes as soon as one player wins or every player looses. Here is a diagram showing how the polling is working.
 
 ```mermaid
 sequenceDiagram
