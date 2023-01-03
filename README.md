@@ -1,4 +1,5 @@
 # ⚃ Mastermind ⚃
+<img width="1431" alt="Screen Shot 2023-01-02 at 11 38 07 PM" src="https://user-images.githubusercontent.com/45411265/210301380-0c94a57b-6a9f-4f07-9e36-2f7a22aa8bb7.png">
 
 # How to play
 
@@ -217,7 +218,11 @@ sequenceDiagram
 
 Here is a video of the multiplayer feature!
 
-https://user-images.githubusercontent.com/45411265/210296790-11d05aab-cbab-4b51-8d09-5af26d207a23.mov
+
+
+https://user-images.githubusercontent.com/45411265/210301372-25719991-38ae-4614-90d4-f6b9bb477c8d.mov
+
+
 
 # Reflections
 
