@@ -4,15 +4,15 @@
 
 To play, please visit this link: https://mastermind-olive.vercel.app/
 
-From there you can play Mastermind or my extension, Mastermind Race.
+From there you can play my implementation of the classic Mastermind game or my extension, Mastermind Race, where you can race others to see who can crack the code fastest!
 
-To run my code locally, you can pull down my repo, cd into web, and do
+To run my code locally, you can clone my repository, cd into the `web` folder , and run
 
 ```
 npm run dev
 ```
 
-to run my test cases
+To run my test cases, you can run
 
 ```
 npm test
@@ -40,7 +40,7 @@ I got it working in production, but I ran into an error where my local api could
 
 # Code Structure
 
-Broadly for my code structure, I used Next.js as my frontend framework, because I knew I wanted to use react.
+Here is an diagram with an overview of my code structure. I used React for my UI, created classes for my game model representatiom, used GraphQL to send requests to my API, used Nest.js for my API, and made a PostgreSQL database. The following sections go into each of these aspects in more detail.
 
 ```mermaid
 graph TD
@@ -58,7 +58,9 @@ graph TD
     end
 ```
 
-## Pages
+## What happens when you first load the site?
+
+Here is a diagram illustrating what happens when my site first loads and when the user lands on the main game page.
 
 ```mermaid
 sequenceDiagram
@@ -75,17 +77,11 @@ sequenceDiagram
 
 ## UI
 
+I used React and tailwind for my UI. My approach to the UI was to seperate out the UI into as granular components as possible and to place each of those components into its own file to maintain code organization. I also used Radix Dialog to create the "Rules" modal.
+
 ## Models
 
-The models are typescript classes responsible for instantiang objects and making graphql queries and mutations
-
-- Game
-- Board
-- Row
-- Feedback
-- CompetitorBoard
-- CompetitorFeedback
-- Options
+The models are typescript classes responsible for instantiang objects and making graphql queries and mutations. Here is a diagram of all the classes I made and their relationship to eachother. I chose to use aggregation so I could represent the "has a" porperty of my classes.
 
 ```mermaid
 classDiagram
@@ -121,13 +117,21 @@ classDiagram
   CompetitorBoardModel  --o  CompetitorFeedbackModel
 ```
 
-## API (graphql, nest)
+## API
+
+For my API, I used Nest.js, and chose to use GraphQL to define queries and mutations, and TypeORM to connect to my database.
+
+I created resources corresponding to each of my database tables:
+
+- games
+- games_boards
+- game_rows
 
 ## Database (postgres)
 
-For my database, I choose to use PostgreSQL. Knowing early on I wanted to support the idea of a multiplayer game, I decided the game table would be my "top level" one, and it would have a foriegn key to the game_boards table.
+For my database, I choose to use PostgreSQL. Knowing early on I wanted to support the idea of a multiplayer game, I decided the game table would be my "top level" one, and it would have a foriegn key to the game_boards table. This would create a one-to-many relationship between the game and game_boards tables.
 
-Initially I also had a players table, and the game_boards table had a forgien key to the players table. As I continued working on this, and removed the idea of login, I realized I could "merge" the idea of players with boards by adding a name column to the game_board table.
+Initially I also had a players table, and the game_boards table had a forgien key to the players table. As I continued working on this, as a means to get a MVP, I realized I could "merge" the idea of players with boards by adding a name column to the game_board table.
 
 ```mermaid
 classDiagram
@@ -168,7 +172,15 @@ game_boards "1" --> "*" game_rows : has
 
 ## Persisting Game State
 
+The first extension I implemented was persisting the game state. This was achieved by creating my database and API as described above, and setting up my games/[id].tsx page to query the game and game board.
+
 ## Multiplayer
+
+The next extension I implemented was multiplayer functionality. This was achieved by creating queries to get competitor game boards.
+
+Intially I wanted to use web sockets, specifically the library socket.io to create the realtime updates between two players. I got a basic version with socket.io working locally, but after looking into it, I realized that Vercel doesn't work with web sockets in production.
+
+So I chose to instead use polling, a technique to periodically send query at a given interval until a condition is met. Polling starts as soon as the player creates or joins a multiplayer game, and it finishes as soon as one player wins or every player looses.
 
 # Reflections
 
@@ -178,10 +190,6 @@ game_boards "1" --> "*" game_rows : has
 - the game_rows table needs a unique pair contraint between the game_board_id and row_num
 - Set up my developmenet environement more so i have a local db and local api... maybe use and learn docker more.
 
-## Things I would do more of
-
-## Things I would do differently
-
--
-
 ## Things I learned
+
+- Mastermind
