@@ -72,7 +72,7 @@ I used React and [Tailwind](https://tailwindcss.com/) for my UI. My approach to 
 
 ## Models
 
-The models are typescript classes responsible for instantiang objects and making graphql queries and mutations. Here is a diagram of all the classes I made and their relationship to each other. I chose to use aggregation so I could represent the "has a" porperty of my classes. For example, the game "has a" board and the board "has a" list of rows.
+The models are TypeScript classes responsible for storing game state, performing game logic, and making GraphQL queries and mutations. Here is a diagram of all the classes I made and their relationship to each other. I chose to use aggregation so I could represent the "has a" porperty of my classes. For example, the game "has a" board and the board "has a" list of rows.
 
 ```mermaid
 classDiagram
@@ -173,6 +173,15 @@ Intially I wanted to use web sockets, specifically the library socket.io to crea
 
 So I chose to instead use polling, a technique to periodically send query at a given interval until a condition is met. Polling starts as soon as the player creates or joins a multiplayer game, and it finishes as soon as one player wins or every player looses.
 
+```mastermind
+sequenceDiagram
+    loop until multiPlayerResult !== undefined
+    Game.tsx->>mastermind-api: competitorBoards = game.getCompetitorBoards()
+    Game.tsx->>mastermind-api: multiPlayerResult = game.getMultiPlayerGameResult()
+
+    end
+```
+
 # Reflections
 
 ## Known bugs / desired improvmenets
@@ -180,6 +189,7 @@ So I chose to instead use polling, a technique to periodically send query at a g
 - game_boards table needs to have a unique constraint on the name
 - the game_rows table needs a unique pair contraint between the game_board_id and row_num
 - Set up my developmenet environement more so i have a local db and local api... maybe use and learn docker more.
+- first time you load the game
 
 ## Things I learned
 

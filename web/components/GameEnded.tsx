@@ -12,7 +12,7 @@ export const GameEnded = ({ message, code }: GameEndedProps) => {
       <div>code: {code}</div>
       <button
         onClick={() => {
-          router.push(`/start`);
+          router.push(`/`);
         }}
         className="w-40 h-10 flex justify-center items-center bg-green-200 hover:bg-green-300 rounded-lg"
       >
