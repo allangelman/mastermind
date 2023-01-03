@@ -175,6 +175,10 @@ Intially I wanted to use web sockets, specifically the library socket.io to crea
 
 So I chose to instead use polling, a technique to periodically send query at a given interval until a condition is met. Polling starts as soon as the player creates or joins a multiplayer game, and it finishes as soon as one player wins or every player looses.
 
+
+https://user-images.githubusercontent.com/45411265/210296790-11d05aab-cbab-4b51-8d09-5af26d207a23.mov
+
+
 ```mermaid
 sequenceDiagram
     loop until multiPlayerResult !== undefined
