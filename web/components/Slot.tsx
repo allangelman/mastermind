@@ -18,9 +18,11 @@ export const Slot = ({
     rowModel.values[colNumber]
   );
 
+  const unsetSlotValue = slotValue === -1 || slotValue === 8;
+
   return (
     <>
-      {slotValue === -1 && currentRound === rowModel.rowNumber ? (
+      {unsetSlotValue && currentRound === rowModel.rowNumber ? (
         <div
           onClick={() => {
             onClick();
@@ -28,7 +30,7 @@ export const Slot = ({
           }}
           className="w-10 h-10 flex rounded-full bg-white border-2 hover:bg-slate-300 border-black"
         ></div>
-      ) : slotValue === -1 ? (
+      ) : unsetSlotValue ? (
         <div className="w-10 h-10 flex justify-center items-center rounded-full bg-slate-500 border-2 border-black"></div>
       ) : (
         <div className="w-10 h-10 flex justify-center items-center rounded-full bg-white border-2 border-black">

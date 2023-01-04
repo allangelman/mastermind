@@ -25,6 +25,7 @@ export const Row = ({
   setGameResult,
 }: RowProps) => {
   const [feedback, setFeedback] = useState<number[]>(rowModel.feedbackValues);
+  const [error, setError] = useState<string>();
 
   return (
     <div className="flex flex-row space-x-3 justify-center items-center">
@@ -49,13 +50,18 @@ export const Row = ({
           rowModel.setFeedback(rowModel.values);
           setFeedback(rowModel.feedbackValues);
           setGameResult(board.getResult(rowModel.rowNumber));
-          await rowModel.saveRow();
+          try {
+            await rowModel.saveRow();
 
-          board.incrementRound();
-          setCurrentRound(board.currentRound);
+            board.incrementRound();
+            setCurrentRound(board.currentRound);
+          } catch {
+            setError("Error. Please refresh.");
+          }
         }}
-        disabled={disabled}
+        disabled={disabled || !!error}
       />
+      {error && <div>{error}</div>}
     </div>
   );
 };

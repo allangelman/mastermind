@@ -36,6 +36,7 @@ export default function Home({ code }: HomePageProps) {
     useState<boolean>(false);
   const [multiPlayerLoading, setIsMutiPlayerLoading] = useState<boolean>(false);
   const [joinLoading, setIsJoinLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string>();
 
   const gql = new GQLClient();
 
@@ -143,18 +144,25 @@ export default function Home({ code }: HomePageProps) {
         />
         <StartPageButton
           onClick={async () => {
-            const boardData = await createBoard(
-              inputGameJoinValue,
-              inputNameJoinValue
-            ).finally(() => setIsJoinLoading(false));
-            router.push(
-              `/game/${inputGameJoinValue}?boardId=${boardData?.createGameBoard.id}&multiplayer=true`
-            );
+            try {
+              const boardData = await createBoard(
+                inputGameJoinValue,
+                inputNameJoinValue
+              ).finally(() => setIsJoinLoading(false));
+              router.push(
+                `/game/${inputGameJoinValue}?boardId=${boardData?.createGameBoard.id}&multiplayer=true`
+              );
+            } catch {
+              setError(
+                "The game code is not valid and/or the someone with the same name already joined the game."
+              );
+            }
           }}
           disabled={isJoinButtonDisabled}
           loading={joinLoading}
           text={"Join multiplayer game"}
         />
+        <div>{error}</div>
         <StartPageSeperator />
         <Rules />
       </div>
