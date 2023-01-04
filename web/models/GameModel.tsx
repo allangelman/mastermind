@@ -75,6 +75,12 @@ export class GameModel {
         multiplayer_result: result,
       },
     });
+
+    // if a player's game was cut short during a multiplayer game, update their board result to "Lost"
+    // this is nessecary to update for when you refresh a player's board, since the current round is dependent on the board result
+    if (!this.board.result) {
+      this.board.updateResult("Lost");
+    }
   }
 
   async getCompetitorBoards(): Promise<CompetitorBoardModel[]> {

@@ -45,6 +45,9 @@ export const Game = ({ game }: GameProps) => {
     const startPolling = async (): Promise<void> => {
       if (query.multiplayer && !multiPlayerGameResult) {
         await pollCompetitorBoards();
+      } else if (query.multiplayer) {
+        const competitorBoards = await game.getCompetitorBoards();
+        setCompetitorBoards(competitorBoards);
       }
     };
     startPolling();

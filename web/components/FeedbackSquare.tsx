@@ -1,4 +1,3 @@
-import { useRouter } from "next/router";
 import cn from "classnames";
 
 interface FeedbackSquareProps {
@@ -9,7 +8,6 @@ export const FeedbackSquare = ({
   feedback,
   className,
 }: FeedbackSquareProps) => {
-  const router = useRouter();
   return (
     <div className={cn(className, "flex flex-col space-y-1")}>
       <div className="flex flex-row space-x-1">

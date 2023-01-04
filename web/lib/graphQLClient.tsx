@@ -44,7 +44,6 @@ export interface getGameVariables {
 }
 
 // not fetching feedback from db because calcuating on the client in the feedback model class
-// maybe change this?
 export const GET_BOARD = gql`
   query findGameBoardById($id: ID!) {
     findGameBoardById(id: $id) {

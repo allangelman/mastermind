@@ -84,7 +84,7 @@ export class BoardModel {
     }
   }
 
-  private async updateResult(result: string): Promise<void> {
+  async updateResult(result: string): Promise<void> {
     await this.gql.request<updateBoardResultData, updateBoardResultVariables>(
       UPDATE_GAME_RESULT,
       {
