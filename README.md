@@ -1,5 +1,26 @@
 # ⚃ Mastermind ⚃
+
 <img width="1431" alt="Screen Shot 2023-01-02 at 11 38 07 PM" src="https://user-images.githubusercontent.com/45411265/210301380-0c94a57b-6a9f-4f07-9e36-2f7a22aa8bb7.png">
+
+# Table of Contents
+
+- [How to play](#how-to-play)
+- [Development Process](#development-process)
+- [Code Structure](#code-structure)
+  - [Data fetching]()
+  - [UI]()
+  - [Models]()
+  - [API]()
+  - [Database]()
+- [Extensions](#extensions)
+  - [Persisting Game State]()
+  - [Multiplayer]()
+- [Edge cases]()
+  - [Two players with same name]()
+  - [Game opened in multiple windows]()
+  - [Checking unfilled row]()
+- [Reflections](#reflections)
+- [Things I learned](#things-i-learned)
 
 # How to play
 
@@ -50,21 +71,44 @@ graph TD
     C -->|TypeORM| D("Database (PostgreSQL)")
 ```
 
-## What happens when you first load the site?
+## Data fetching
 
-Here is a diagram illustrating what happens when my site first loads and when the user lands on the main game page.
+One part of the code I spent quite a bit of time refactoring is the index.tsx and [id].tsx page in order to optomize the user's first experience in terms of load time.
+
+After a few iterations, here is a diagram illustrating how my almost final version looked like. I leverage the getServerSideProps functionality of Next.js to query the code in index.tsx and to query the game and board in [id].tsx. While query the game and board in getServerSideProps in [id].tsx worked well/fast on any refresh after an initial load, it caused an issue for the user's first load experience. Making this diagram actually helped me pinpoint and solve the issue! If you can see from the light blue rectangle region, I was making two round trips to the api before the GamePage loaded! That meant, the user would be stuck on the intital page after having clicked the button to start the game until all of that finished!
 
 ```mermaid
 sequenceDiagram
     index.tsx getServerSideProps ->>+ random.org/integers: sends request for numbers
     random.org/integers ->>+ index.tsx getServerSideProps: responds with numbers
     index.tsx getServerSideProps ->>+ index.tsx Home: passes numbers
+    rect rgb(230, 255, 255)
+    note right of mastermind-api: Two round trips to the api before GamePage!
     index.tsx Home ->>+ mastermind-api: sends requests to create game/board
     mastermind-api ->>+ index.tsx Home: responds with game/board data
     index.tsx Home ->>+ game/[id].tsx getServerSideProps: routes to
     game/[id].tsx getServerSideProps ->>+ mastermind-api: sends request to get game/board
     mastermind-api ->>+ game/[id].tsx getServerSideProps: respondes with game/board data
+    end
     game/[id].tsx getServerSideProps ->>+ game/[id].tsx GamePage: passes game/board data
+```
+
+The way I refactored this was to move the queries for the game and board into a useEffect in GamePage.tsx and create a SkeletonGame that displays while the data is being fetched!
+
+```mermaid
+sequenceDiagram
+    index.tsx getServerSideProps ->>+ random.org/integers: sends request for numbers
+    random.org/integers ->>+ index.tsx getServerSideProps: responds with numbers
+    index.tsx getServerSideProps ->>+ index.tsx Home: passes numbers
+    rect rgb(230, 255, 255)
+    note left of mastermind-api: Now one round trip to the api before GamePage!
+    index.tsx Home ->>+ mastermind-api: sends requests to create game/board
+    mastermind-api ->>+ index.tsx Home: responds with game/board data
+    end
+    index.tsx Home ->>+ game/[id].tsx getServerSideProps: routes to
+    game/[id].tsx getServerSideProps ->>+ game/[id].tsx GamePage: passes gameId and boardId
+    game/[id].tsx GamePage ->>+ mastermind-api: sends request to get game/board data (GameSkeleton in meantime)
+    mastermind-api ->>+ game/[id].tsx GamePage: respondes with game/board data (GameSkeleton in meantime)
 ```
 
 ## UI
@@ -218,21 +262,28 @@ sequenceDiagram
 
 Here is a video of the multiplayer feature!
 
-
-
 https://user-images.githubusercontent.com/45411265/210301372-25719991-38ae-4614-90d4-f6b9bb477c8d.mov
 
+# Edge cases
 
+## Two players with the same name
+
+If two players with the same name enter one game, the multiplayer game result won't be updated correctly since I am used a dictionary to compute that value, which relies on unique keys. The solution would be to enforce a unique constraint on the name column in the game_boards table and then have error handeling on the front end. Another solution would be to implement login and store player information in it's own table.
+
+## Same game opened in two windows
+
+If you open the same game in two browsers and update the rows, and then refresh, the board will be loaded with all the rows from both games. The solution would be to enforce a unique contraint on the game_rows table between the game_board_id and row_num columns. In other words, it should not be allowed to have two game_row entries both with a row_num of 1 and both with the same game_board_id. Once the unique constraint is enforced, then there should also be error handeling on the front end. Another possiblity would be to optomistically update the row and upon any error, the row falls back to the empty state.
+
+## Checking a row without all numbers filled
+
+I currently represent the default board values as -1 values which I render as dark gray on the frontend. I also allow users to submit checks even if they did not fill out all the number values. If someone submits a row without all the numbers inputted and then refresh, the -1 values get saved into the database, and get parsed incorrectly on the frontend when the data loads in.
 
 # Reflections
 
 ## Known bugs / desired improvmenets
 
-- If two players with the same name enter one game, the multiplayer game result won't be updated correctly since I am used a dictionary to compute that value, which relies on unique keys. The solution would be to enforce a unique constraint on the name column in the game_boards table and then have error handeling on the front end. Another solution would be to implement login and store player information in it's own table.
-- If you open the same game in two browsers and update the rows, and then refresh, the board will be loaded with all the rows from both games. The solution would be to enforce a unique contraint on the game_rows table between the game_board_id and row_num columns. In other words, it should not be allowed to have two game_row entries both with a row_num of 1 and both with the same game_board_id. Once the unique constraint is enforced, then there should also be error handeling on the front end. Another possiblity would be to optomistically update the row and upon any error, the row falls back to the empty state.
-- I noticed sometimes, the first time I click of one the start game buttons on the inital page, it takes a while for the game page to load. I believe this is because of the way I have it set up where the game and board are created on the index.tsx page and then queried again in the [id].tsx page as I described in the above diagram.
-- I currently represent the default board values as -1 values which I render as dark gray on the frontend. I also allow users to submit checks even if they did not fill out all the number values. If someone submits a row without all the numbers inputted and then refresh, the -1 values get saved into the database, and get parsed incorrectly on the frontend when the data loads in.
 - When I was working on setting up my development environment, I time boxed it, and decided to just made a production database and production API. I was running into errors when trying to run my local API, so I decided to just punt on that issue. I think ideally, I maybe would have even looked into setting up my developmenet environement with Docker.
+- Adding back players table... then you can load all the games by player ID
 
 ## Things I learned
 
