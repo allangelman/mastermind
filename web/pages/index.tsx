@@ -154,7 +154,7 @@ export default function Home({ code }: HomePageProps) {
               );
             } catch {
               setError(
-                "The game code is not valid and/or the someone with the same name already joined the game."
+                "The game code is not valid and/or someone with the same name already joined the game."
               );
             }
           }}

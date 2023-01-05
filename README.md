@@ -4,11 +4,12 @@
 
 - [Overview](#overview)
 - [How to play](#how-to-play)
+- [How to run locally](#how-to-run-locally)
 - [Development Process](#development-process)
 - [Code Structure](#code-structure)
-  - [Data fetching](#data-fetching)
   - [UI](#ui)
   - [Models](#models)
+  - [Data fetching](#data-fetching)
   - [API](#api)
   - [Database](#database)
 - [Extensions](#extensions)
@@ -39,13 +40,15 @@ To play, please visit this link: https://mastermind-olive.vercel.app/
 
 From there you can play my implementation of the classic Mastermind game or my extension, Mastermind Race, where you can race others to see who can crack the code fastest!
 
-To run my code locally, you can clone my repository, cd into the `web` folder , and run
+# How to run locally
+
+To run my code locally, you can clone my repository, cd into the `web` folder and run
 
 ```
 npm run dev
 ```
 
-You may also have to run `npm install` before `npm run dev` depending on what you already have installed on your computer.
+You may also have to run `npm install` before `npm run dev`
 
 To run my test cases for the feedback logic, you can run
 
@@ -99,46 +102,6 @@ graph TD
     C -->|TypeORM| D("Database (PostgreSQL)")
 ```
 
-## Data fetching
-
-One part of the code I spent quite a bit of time refactoring is the index.tsx and [id].tsx pages in order to optimize the user's first experience in terms of load time and to get Data Persistence to work.
-
-After a few iterations, here is a diagram illustrating how my almost final version looked like. I leverage the getServerSideProps functionality of Next.js to query the code in index.tsx and to query the game and board in [id].tsx. While querying the game and board in getServerSideProps in [id].tsx worked well on any refresh after an initial load, it caused an issue for the user's first load experience. Making this diagram actually helped me pinpoint and solve the issue! If you can see from the light blue rectangle region, I was making two round trips to the api before the GamePage loaded! That meant the user would be stuck on the initial page after having clicked the button to start the game until all of those requests resolved!
-
-```mermaid
-sequenceDiagram
-    index.tsx getServerSideProps ->>+ random.org/integers: sends request for numbers
-    random.org/integers ->>+ index.tsx getServerSideProps: responds with numbers
-    index.tsx getServerSideProps ->>+ index.tsx Home: passes numbers
-    rect rgb(230, 255, 255)
-    note right of mastermind-api: Two round trips to the api before GamePage!
-    index.tsx Home ->>+ mastermind-api: sends requests to create game/board
-    mastermind-api ->>+ index.tsx Home: responds with game/board data
-    index.tsx Home ->>+ game/[id].tsx getServerSideProps: routes to
-    game/[id].tsx getServerSideProps ->>+ mastermind-api: sends request to get game/board
-    mastermind-api ->>+ game/[id].tsx getServerSideProps: responds with game/board data
-    end
-    game/[id].tsx getServerSideProps ->>+ game/[id].tsx GamePage: passes game/board data
-```
-
-The way I refactored this was to move the queries for the game and board into a useEffect in GamePage.tsx and create a SkeletonGame that displays while the data is being fetched! This way the game and board only have to be created before the user is routed to the GamePage. While in the end, the load time is technically still the same, it creates a more robust experience where the user is reassured that their game is loading because their first route to the GamePage happens much more quickly.
-
-```mermaid
-sequenceDiagram
-    index.tsx getServerSideProps ->>+ random.org/integers: sends request for numbers
-    random.org/integers ->>+ index.tsx getServerSideProps: responds with numbers
-    index.tsx getServerSideProps ->>+ index.tsx Home: passes numbers
-    rect rgb(230, 255, 255)
-    note left of mastermind-api: Now one round trip to the api before GamePage!
-    index.tsx Home ->>+ mastermind-api: sends requests to create game/board
-    mastermind-api ->>+ index.tsx Home: responds with game/board data
-    end
-    index.tsx Home ->>+ game/[id].tsx getServerSideProps: routes to
-    game/[id].tsx getServerSideProps ->>+ game/[id].tsx GamePage: passes gameId and boardId
-    game/[id].tsx GamePage ->>+ mastermind-api: sends request to get game/board data (GameSkeleton in meantime)
-    mastermind-api ->>+ game/[id].tsx GamePage: responds with game/board data (GameSkeleton in meantime)
-```
-
 ## UI
 
 I used React and [Tailwind](https://tailwindcss.com/) for my UI. My approach for the UI was to separate it out into as granular components as possible and to place each of those components into their own files to maintain code organization. I also used the [Radix Dialog](https://www.radix-ui.com/docs/primitives/components/dialog) to create the "Rules" modal.
@@ -179,6 +142,46 @@ classDiagram
   BoardModel  --o  OptionsModel
   RowModel  --o  FeedbackModel
   CompetitorBoardModel  --o  CompetitorFeedbackModel
+```
+
+## Data fetching
+
+One part of the code I spent quite a bit of time refactoring is the index.tsx and [id].tsx pages in order to optimize the user's first experience in terms of load time and to get Data Persistence to work.
+
+After a few iterations, here is a diagram illustrating how my almost final version looked like. I leverage the getServerSideProps functionality of Next.js to query the code in index.tsx and to query the game and board in [id].tsx. While querying the game and board in getServerSideProps in [id].tsx worked well on any refresh after an initial load, it caused an issue for the user's first load experience. Making this diagram actually helped me pinpoint and solve the issue! If you can see from the light blue rectangle region, I was making two round trips to the api before the GamePage loaded! That meant the user would be stuck on the initial page after having clicked the button to start the game until all of those requests resolved!
+
+```mermaid
+sequenceDiagram
+    index.tsx getServerSideProps ->>+ random.org/integers: sends request for numbers
+    random.org/integers ->>+ index.tsx getServerSideProps: responds with numbers
+    index.tsx getServerSideProps ->>+ index.tsx Home: passes numbers
+    rect rgb(230, 255, 255)
+    note right of mastermind-api: Two round trips to the api before GamePage!
+    index.tsx Home ->>+ mastermind-api: sends requests to create game/board
+    mastermind-api ->>+ index.tsx Home: responds with game/board data
+    index.tsx Home ->>+ game/[id].tsx getServerSideProps: routes to
+    game/[id].tsx getServerSideProps ->>+ mastermind-api: sends request to get game/board
+    mastermind-api ->>+ game/[id].tsx getServerSideProps: responds with game/board data
+    end
+    game/[id].tsx getServerSideProps ->>+ game/[id].tsx GamePage: passes game/board data
+```
+
+The way I refactored this was to move the queries for the game and board into a useEffect in GamePage.tsx and create a SkeletonGame that displays while the data is being fetched! This way the game and board only have to be created before the user is routed to the GamePage. While in the end, the load time is technically still the same, it creates a more robust experience where the user is reassured that their game is loading because their first route to the GamePage happens much more quickly.
+
+```mermaid
+sequenceDiagram
+    index.tsx getServerSideProps ->>+ random.org/integers: sends request for numbers
+    random.org/integers ->>+ index.tsx getServerSideProps: responds with numbers
+    index.tsx getServerSideProps ->>+ index.tsx Home: passes numbers
+    rect rgb(230, 255, 255)
+    note left of mastermind-api: Now one round trip to the api before GamePage!
+    index.tsx Home ->>+ mastermind-api: sends requests to create game/board
+    mastermind-api ->>+ index.tsx Home: responds with game/board data
+    end
+    index.tsx Home ->>+ game/[id].tsx getServerSideProps: routes to
+    game/[id].tsx getServerSideProps ->>+ game/[id].tsx GamePage: passes gameId and boardId
+    game/[id].tsx GamePage ->>+ mastermind-api: sends request to get game/board data (GameSkeleton in meantime)
+    mastermind-api ->>+ game/[id].tsx GamePage: responds with game/board data (GameSkeleton in meantime)
 ```
 
 ## API
