@@ -1,6 +1,9 @@
 # ⚃ Mastermind ⚃
+<img width="504" alt="Screen Shot 2023-01-04 at 9 28 12 PM" src="https://user-images.githubusercontent.com/45411265/210687813-07aefe52-f30e-43c4-b4dc-7a048effa897.png">
 
-<img width="1431" alt="Screen Shot 2023-01-02 at 11 38 07 PM" src="https://user-images.githubusercontent.com/45411265/210301380-0c94a57b-6a9f-4f07-9e36-2f7a22aa8bb7.png">
+<img width="731" alt="Screen Shot 2023-01-04 at 9 21 57 PM" src="https://user-images.githubusercontent.com/45411265/210687819-abb0a8ff-5bcf-4d51-a7c2-6f656a5612ef.png">
+
+
 
 # Table of Contents
 
@@ -241,7 +244,11 @@ The first extension I implemented was persisting the game state. This was achiev
 
 Here is a video of the persisting game state feature!
 
-https://user-images.githubusercontent.com/45411265/210295929-97681bf2-bc6b-45b9-9be6-305ae32015a2.mov
+
+https://user-images.githubusercontent.com/45411265/210691034-ab6da477-af16-4eba-8867-2503de750b11.mov
+
+
+
 
 ## Multiplayer
 
@@ -262,7 +269,15 @@ sequenceDiagram
 
 Here is a video of the multiplayer feature!
 
-https://user-images.githubusercontent.com/45411265/210301372-25719991-38ae-4614-90d4-f6b9bb477c8d.mov
+
+
+
+https://user-images.githubusercontent.com/45411265/210690974-ae0e4cde-43d8-4e4e-b764-06261d06a1f1.mov
+
+
+
+https://user-images.githubusercontent.com/45411265/210691014-4da278a6-7142-47df-911b-c300ce65134a.mov
+
 
 # Edge cases
 
@@ -270,13 +285,31 @@ https://user-images.githubusercontent.com/45411265/210301372-25719991-38ae-4614-
 
 If two players with the same name enter one game, the multiplayer game result won't be updated correctly since I am used a dictionary to compute that value, which relies on unique keys. The solution would be to enforce a unique constraint on the name column in the game_boards table and then have error handeling on the front end. Another solution would be to implement login and store player information in it's own table.
 
+
+
+https://user-images.githubusercontent.com/45411265/210691067-f57a3452-7685-4f4f-a655-0e07f1c6896b.mov
+
+
+
 ## Same game opened in two windows
 
 If you open the same game in two browsers and update the rows, and then refresh, the board will be loaded with all the rows from both games. The solution would be to enforce a unique contraint on the game_rows table between the game_board_id and row_num columns. In other words, it should not be allowed to have two game_row entries both with a row_num of 1 and both with the same game_board_id. Once the unique constraint is enforced, then there should also be error handeling on the front end. Another possiblity would be to optomistically update the row and upon any error, the row falls back to the empty state.
 
+
+
+https://user-images.githubusercontent.com/45411265/210691086-603b4327-d9ff-43cd-987a-1b7459c5bd33.mov
+
+
+
 ## Checking a row without all numbers filled
 
 I currently represent the default board values as -1 values which I render as dark gray on the frontend. I also allow users to submit checks even if they did not fill out all the number values. If someone submits a row without all the numbers inputted and then refresh, the -1 values get saved into the database, and get parsed incorrectly on the frontend when the data loads in.
+
+
+
+https://user-images.githubusercontent.com/45411265/210691117-9338ba22-37b0-4340-8663-d17a42ffcf6c.mov
+
+
 
 # Reflections
 
