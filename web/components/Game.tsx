@@ -10,6 +10,8 @@ import useClipboard from "react-use-clipboard";
 import { Rules } from "./Rules";
 import { Header } from "./Header";
 import { GameModel } from "../models/GameModel";
+import { StartPageSeperator } from "./StartPageSeperator";
+import cn from "classnames";
 
 interface GameProps {
   game: GameModel;
@@ -78,45 +80,39 @@ export const Game = ({ game }: GameProps) => {
   };
 
   return (
-    <div className="flex flex-col justify-center">
-      <Header isMultiplayer={!!query.multiplayer} />
-      <div className="flex justify-center">{board.code}</div>
-      <div className="flex justify-center">
-        <Rules />
-      </div>
-      {query.multiplayer && (
-        <div className="flex flex-row space-x-2 items-center justify-center">
-          <div> Game code: {game.id} </div>
-          <button
-            className="h-10 rounded bg-green-300 px-2 hover:bg-green-500"
-            onClick={() => setGameCodeCopied()}
-          >
-            {isGameCodeCopied ? "Copied!" : "Copy and share!"}
-          </button>
+    <div className="flex flex-col">
+      <div className="mx-auto">
+        <div className="w-[500px] mx-auto ">
+          <Header isMultiplayer={!!query.multiplayer} />
         </div>
-      )}
-      <div className="mx-auto w-[800px] justify-center flex flex-row space-x-4">
-        <div className="flex flex-col items-center space-y-2">
-          <div>{board.name}</div>
-          <div className="flex flex-col space-y-2">
+        <div className="flex justify-center">{board.code}</div>
+      </div>
+      <div className="flex flex-col mx-auto border-2 rounded-lg border-blue-500 ">
+        <div className="flex flex-row items-center  min-h-[120px] mx-auto p-4  space-x-2">
+          {!gameEnded && !multiPlayerGameResult && (
             <>
-              {board.rows.map((rowModel, i) => (
-                <Row
-                  key={i}
-                  rowModel={rowModel}
-                  numSlots={board.numSlots}
-                  board={board}
-                  currentRound={currentRound}
-                  setCurrentRound={setCurrentRound}
-                  setGameResult={setGameResult}
-                  disabled={
-                    board.result !== undefined ||
-                    game.multiPlayerResult !== undefined
-                  }
-                />
-              ))}
+              <Options options={board.options} />
+              <Rules />
+              {query.multiplayer && (
+                <div className="flex flex-row space-x-2 mx-auto items-center justify-center">
+                  <button
+                    className={cn(
+                      "h-10 w-[170px] rounded-lg bg-green-300 px-2",
+                      {
+                        "hover:bg-green-500": !isGameCodeCopied,
+                      }
+                    )}
+                    onClick={() => setGameCodeCopied()}
+                    disabled={isGameCodeCopied}
+                  >
+                    {!isGameCodeCopied
+                      ? "Copy Game Code"
+                      : "Copied! Now Share!"}
+                  </button>
+                </div>
+              )}
             </>
-          </div>
+          )}
           {gameEnded && !query.multiplayer && (
             <GameEnded
               message={gameResult === "Won" ? "WON!" : "LOST :("}
@@ -126,13 +122,39 @@ export const Game = ({ game }: GameProps) => {
           {multiPlayerGameResult && (
             <GameEnded message={multiPlayerGameResult} code={board.code} />
           )}
-          <Options options={board.options} />
         </div>
-        {query.multiplayer &&
-          competitorBoards.map((competitorBoard, i) => (
-            <>
-              <div key={`competitor-${i}`} className="flex flex-col">
-                <div key={`id-${i}`}>{competitorBoard.name}</div>
+        <div className="mx-auto justify-center border-t-2 min-w-[460px] border-blue-500 flex flex-row">
+          <div className="flex flex-col p-4 items-center space-y-2">
+            <div>{board.name}</div>
+            <div className="w-[300px] flex flex-col space-y-2">
+              <>
+                {board.rows.map((rowModel, i) => (
+                  <Row
+                    key={i}
+                    rowModel={rowModel}
+                    numSlots={board.numSlots}
+                    board={board}
+                    currentRound={currentRound}
+                    setCurrentRound={setCurrentRound}
+                    setGameResult={setGameResult}
+                    disabled={
+                      board.result !== undefined ||
+                      game.multiPlayerResult !== undefined
+                    }
+                  />
+                ))}
+              </>
+            </div>
+          </div>
+          {query.multiplayer &&
+            competitorBoards.map((competitorBoard, i) => (
+              <div
+                key={`competitor-${i}`}
+                className="flex flex-col w-[120px] pt-4 items-center border-l-2 border-blue-500"
+              >
+                <div className="truncate w-[100px] text-center" key={`id-${i}`}>
+                  {competitorBoard.name}
+                </div>
                 <div key={`feedback-${i}`} className="space-y-2 pt-2">
                   {competitorBoard.feedbacks.map((competitorFeedback, i) => (
                     <FeedbackSquare
@@ -142,8 +164,8 @@ export const Game = ({ game }: GameProps) => {
                   ))}
                 </div>
               </div>
-            </>
-          ))}
+            ))}
+        </div>
       </div>
     </div>
   );

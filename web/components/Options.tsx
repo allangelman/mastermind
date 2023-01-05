@@ -1,25 +1,30 @@
 import { OptionsModel } from "../models/OptionsModel";
+import { Rules } from "./Rules";
 
 interface OptionsProps {
   options: OptionsModel;
 }
 
 export const Options = ({ options }: OptionsProps) => {
+  const firstFour = options.values.slice(0, 4);
+  const lastFour = options.values.slice(4, 8);
   return (
-    <div className="mx-auto w-[400px]">
-      <Row options={options} />
+    <div className="flex flex-col space-y-2">
+      <Row options={options} values={firstFour} />
+      <Row options={options} values={lastFour} />
     </div>
   );
 };
 
 interface RowProps {
+  values: number[];
   options: OptionsModel;
 }
 
-export const Row = ({ options }: RowProps) => {
+export const Row = ({ values, options }: RowProps) => {
   return (
     <div className="flex flex-row space-x-2 justify-center">
-      {options.values.map((number, i) => (
+      {values.map((number, i) => (
         <Slot
           key={i}
           value={number}
