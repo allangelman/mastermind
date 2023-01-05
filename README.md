@@ -1,12 +1,8 @@
 # ⚃ Mastermind ⚃
-<img width="504" alt="Screen Shot 2023-01-04 at 9 28 12 PM" src="https://user-images.githubusercontent.com/45411265/210687813-07aefe52-f30e-43c4-b4dc-7a048effa897.png">
-
-<img width="731" alt="Screen Shot 2023-01-04 at 9 21 57 PM" src="https://user-images.githubusercontent.com/45411265/210687819-abb0a8ff-5bcf-4d51-a7c2-6f656a5612ef.png">
-
-
 
 # Table of Contents
 
+- [Overview]()
 - [How to play](#how-to-play)
 - [Development Process](#development-process)
 - [Code Structure](#code-structure)
@@ -24,6 +20,14 @@
   - [Checking unfilled row]()
 - [Reflections](#reflections)
 - [Things I learned](#things-i-learned)
+
+# Overview
+
+This is a web application that allows users to play the classic Mastermind game, where you crack a code against the computer, and my version Mastermind Race, where you see who can crack the code fastest among your freinds!
+
+<img width="200
+" alt="Screen Shot 2023-01-04 at 9 28 12 PM" src="https://user-images.githubusercontent.com/45411265/210687813-07aefe52-f30e-43c4-b4dc-7a048effa897.png"> <img width="300
+" alt="Screen Shot 2023-01-04 at 9 21 57 PM" src="https://user-images.githubusercontent.com/45411265/210687819-abb0a8ff-5bcf-4d51-a7c2-6f656a5612ef.png">
 
 # How to play
 
@@ -45,23 +49,38 @@ npm test
 
 # Development Process
 
-1. <ins>Research</ins>: The first step in my process was to do research into the game Mastermind. I looked into some online verisions of the game to get familiar with typical UIs and how the game worked.
+<ins>Understand Requirments and Create Big Picture Plan</ins>
 
-2. <ins>UI</ins>: Once that was done, I started my coding process. One of the first decisions I made when working on this project was to use React, since I am fairly comfortable with it and wanted to get the UI done quickly. I also chose to use Next.js as my react framework. Once I opened my repo, created my Next application, I got started making simple react components for my Mastermind game board.
+The first step in my process was to fully understand the product requirments. After thoroughly reading the guide, making test requests to the Integer Generator API, and reading the [Mastermind Wikipidea page](<https://en.wikipedia.org/wiki/Mastermind_(board_game)>) to understand the feedback logic, I understood my task and timeline. After brainstorming potential extensions, I knew something I'd love to try to tackle is making Mastermind a multiplayer game! My initial idea was to implement a two player game, where one person is the code breaker and another is the code generator, esentially taking the place of the computer. But after some more thought, I came up with a different way to make the game multiplayer -- by turning it into a race! Inspired by [Jackbox games](https://www.jackboxgames.com/), I thought of the idea where multiple players would be in one "game room", and everyone would see the other player's feedback. This would create tension as everyone sees, based on the feedback the other player's are recieving, how close they are to cracking the code! I was really excited by this idea, and I had a vague sense that it would require some form of realtime communication, like WebSockets, but beyond that, I didn't have a clear picture of how to implement this. So I thought of another extension that I was more confident I could achieve, and something that I also thought would be really useful -- persisting game state! From there, I created this flexible plan, since I didn't know exactly how long each step would take and which potential road blocks I would face:
 
-3. <ins>Game logic</ins>: I initially considered just using react state to keep track of the game, but quickly realized I needed a layer behind the UI to store all the game logic. So I created my models, which were Typescript classes to represent the various aspects of the mastermind board.
+- Basic Mastermind implementation: 2-3 days
+- Setting up DB and API: 1-2 days
+- Data persistance: 2-3 days
+- Websockets research: 1 day
+- Multiplayer: 2-3 days
+- Debugging / Polishing / Readme: 1-2 days
 
-4. <ins>Deploy frontend</ins>: Once I was done with that, I decided I wanted to deploy my site, and [Vercel](https://vercel.com/) has an easy way to deploy a Next.js site, so I went with that.
+Here is how my process panned out:
 
-5. <ins>API Planning</ins>: When thinking of what extensions I wanted to add to my game, the first idea I had was to use a database and API to store the game state of board. This would allow users to maintain their in-progress game even if they refresh. I also knew at this point that if I had time, I would also want to try to incorporate some multiplayer aspect as an addtional extension, so I kept that in mind as I went ahead to make my API and database.
+1. <ins>Basic Mastermind implementation</ins>: One of the first decisions I made when working on this project was to use React, since I am fairly comfortable with it and wanted to get the UI done quickly. I also chose to use Next.js as my react framework. So once I opened my repo, created my Next.js application, I got started making simple react components for my Mastermind game board. Next, I considered just using React state to keep track of the game, but quickly realized I needed a layer behind the UI to store all the game logic. So I created my models, which were Typescript classes to represent the various aspects of the mastermind board. This is described in more detail below.
 
-6. <ins>Created DB</ins>: I decided to use [Render](https://render.com/) as my service to host my API and database. First I created my database through Render, and connected to it through my PostgresSQL database client of choice, SQLPro for Postgres. Through SQLPro, I created by databases, and kept track of all the SQL queries I wrote in the `migrations` folder.
+1. <ins>Deploy frontend</ins>: Once I was done with that, I decided I wanted to deploy my site, and [Vercel](https://vercel.com/) has an easy way to deploy a Next.js site, so I went with that.
 
-7. <ins>Created API</ins>: For my API that would communicate with my database, I chose to use [Nest.js](https://docs.nestjs.com/) since it has built in Typescript support. I made my project and chose to go with the GraphQL code-first apporach (explained further below). From there I made the resources using [Nest.js CRUD generator](https://docs.nestjs.com/recipes/crud-generator). This creates boiler plate code, like service and resolver files, which I then was able to fill in with the nessecary queries and mutations I wanted.
+1. <ins>Database and API Setup</ins>: I decided to use [Render](https://render.com/) as my service to host my API and database. First I created my database through Render, and connected to it through my PostgresSQL database client of choice, SQLPro for Postgres. For my API that would communicate with my database, I chose to use [Nest.js](https://docs.nestjs.com/) since it has built in Typescript support. I made my project and chose to go with the GraphQL code-first apporach (explained further below). From there I made the resources using [Nest.js CRUD generator](https://docs.nestjs.com/recipes/crud-generator). This creates boiler plate code, like service and resolver files, which I then was able to fill in with the nessecary queries and mutations I wanted.
 
-8. <ins>Brainstormed multiplayer</ins>: Once I had state persistance working, I had to brainstorm how I would want my multiplayer functionality to work. Inspired by [Jackbox games](https://www.jackboxgames.com/), where one person shares a game code with the rest of the players, I decided I could use a similar approach, where the UUID of the game would be the code!
+1. <ins>Persisting Data</ins> Now that my Database and API where set up, I started creating the tables and API resources nessecary for persisting data. Through SQLPro, I created my databases, and kept track of all the SQL queries I wrote in the `migrations` folder. The first table I made was actually a players table, in anticipation of making my game multiplayer, but later deleted that table (explained here). The final state of my tables and api can be seen here.
 
-9. <ins>Implemented multiplayer</ins>: Once I had that idea secured, I worked on implemnting the idea. This is described in more detail below in the Extensions section!
+1. <ins>Websocket research</ins> Once I had data persisted, I started researching websockets. I read a few articles and eventually found this helpful [YouTube tutorial](https://www.youtube.com/watch?v=djMy4QsPWiI) that showed how to implement basic Websockets with the Socket.io library. I followed the tutoial, along with this [article](https://blog.logrocket.com/implementing-websocket-communication-next-js/) which showed how to integrate Socket.io with Next.js, and got a basic WebSocket functionality working, where I made a text box whose value would update in every window I had open. After running into issues with getting this basic WebSocket functionality working in production, I did some research and found that Vercel (the deployment service I was using) [does not support web sockets](https://vercel.com/guides/do-vercel-serverless-functions-support-websocket-connections). I briefly considered switching deployment services, but then I remembered that during my initial research about WebSockets, I watched this [video](https://www.youtube.com/watch?v=ZBM28ZPlin8) which described the difference between short polling, long polling, and WebSockets. It was described that while short polling is usually a bad design decision ultimatley, since it uses up resources on both the client and server, it is acceptable to use for fast prototyping. So I went ahead with short polling.
+
+1. <ins>Polling implementation</ins> Short polling turned out to not be too difficult to implement itself, since I already had the infrasturcture in place to query my database. The most complicated part was figuring out how to organize the code and have it stop polling when the game ended. The final polling design can be seen here. The more time consuming part of this part of the porject was creating new database queries to get the competitor game boards. So I created a method that gets the boards by game ID excluding the current "player".
+
+1. <ins>Testing and Discovering edge cases</ins> After I had polling working, I stress tested my application by seeing what happens in cases that aren't how I intend the application to be used. Initially I just noted these edge cases in my to-do list, but decided it was not high priority to address them, since I still had to make my ReadMe.
+
+1. <ins>Making ReadMe</ins> This involved creating diagrams using Mermaid and screenrecordings and screenshots. Once I had all those assets, I started drafting my whole process here.
+
+1. <ins>Address edge cases</ins> Once I had a draft of my ReadMe, I started addresseing the edge cases. Here are the edge cases I found and the solutions for them.
+
+1. <ins>Refactor UI and finish ReadMe</ins> After I finished addressing the edge cases, I decided I wanted a slightly more appealing UI, so I refactored the UI with a theme of rounded rectangles and line divisions to create an appealing and easy to parse UI. Once that was done, I finished my ReadMe.
 
 # Code Structure
 
@@ -195,11 +214,13 @@ query findGameBoardById($id: ID!) {
   }
 ```
 
+The reasoning I used to create these queries and mutations was thiking about what data needs to be saved, like game_rows (for that data, I would make a `create` mutation), what data needs to be saved, like game results (for that data, I would make `update` mutation), and what data needs to be read, like game_boards (for that data, I would make `find` queries)
+
 ## Database (postgres)
 
-For my database, I choose to use PostgreSQL. Knowing early on I wanted to support the idea of a multiplayer game, I decided the game table would be my "top level" one, and it would have a foriegn key to the game_boards table. This would create a one-to-many relationship between the game and game_boards tables.
+For my database, I choose to use PostgreSQL. Knowing early on I wanted to support the idea of a multiplayer game, I decided the game table would be my "top level" one, and it would have a foriegn key to the game_boards table. This would create a one-to-many relationship between the game and game_boards tables. There would also be a one-to-many relationship between the game_boards and game_rows.
 
-Initially I also had a players table, and the game_boards table had a forgien key to the players table. As I continued working on this, as a means to get a MVP, I realized I could "merge" the idea of players with boards by adding a name column to the game_board table.
+Initially I also had a players table, and the game_boards table had a forgien key to the players table. As I continued working on this, as a means to get something working faster, I realized I could "merge" the idea of players with boards by adding a name column to the game_board table.
 
 ```mermaid
 classDiagram
@@ -244,11 +265,7 @@ The first extension I implemented was persisting the game state. This was achiev
 
 Here is a video of the persisting game state feature!
 
-
 https://user-images.githubusercontent.com/45411265/210691034-ab6da477-af16-4eba-8867-2503de750b11.mov
-
-
-
 
 ## Multiplayer
 
@@ -269,59 +286,47 @@ sequenceDiagram
 
 Here is a video of the multiplayer feature!
 
-
-
-
 https://user-images.githubusercontent.com/45411265/210690974-ae0e4cde-43d8-4e4e-b764-06261d06a1f1.mov
 
-
+Here is a video of the multiplayer game reaching an end state when one player wins!
 
 https://user-images.githubusercontent.com/45411265/210691014-4da278a6-7142-47df-911b-c300ce65134a.mov
-
 
 # Edge cases
 
 ## Two players with the same name
 
-If two players with the same name enter one game, the multiplayer game result won't be updated correctly since I am used a dictionary to compute that value, which relies on unique keys. The solution would be to enforce a unique constraint on the name column in the game_boards table and then have error handeling on the front end. Another solution would be to implement login and store player information in it's own table.
-
-
+When I tested to see what would happen if two players with the same name enter one game, I realized the game result was not being generated correctly. This was because I used a dictionary with player names as keys to compute that value, and keys in dictionaries have to be unique. The solution I came up with was to enforce a unique pair constraint between the name column and the game_id columns in the game_boards table. This makes it such that every board that points to the same game_id has a unique name. Once I deleted the rows in my database that violated that constraint and ran that query, I had error handeling on the front end. Here is a video of this error handeling:
 
 https://user-images.githubusercontent.com/45411265/210691067-f57a3452-7685-4f4f-a655-0e07f1c6896b.mov
 
-
-
 ## Same game opened in two windows
 
-If you open the same game in two browsers and update the rows, and then refresh, the board will be loaded with all the rows from both games. The solution would be to enforce a unique contraint on the game_rows table between the game_board_id and row_num columns. In other words, it should not be allowed to have two game_row entries both with a row_num of 1 and both with the same game_board_id. Once the unique constraint is enforced, then there should also be error handeling on the front end. Another possiblity would be to optomistically update the row and upon any error, the row falls back to the empty state.
-
-
+Another thing I tested was opening the same game in two browsers and updating the same rows. When I refreshed, the board got loaded with all the saved rows between the two windows. The reason this was happening is because I was not addressing the case of the same row being submitted twice. The solution I came up with was again to enforce a unique contraint on the game_rows table between the game_board_id and row_num columns. In other words, it should not be allowed to have two game_row entries both with a row_num of 1 and both with the same game_board_id. Once the unique constraint was enforced, then I added error handeling on the front end. This was something I wanted to spend more time on to display the error in a modal potentially, since it currently creates a disruptive UI experinece. I noted this in this section. Here is a video of the error handeling:
 
 https://user-images.githubusercontent.com/45411265/210691086-603b4327-d9ff-43cd-987a-1b7459c5bd33.mov
 
-
-
 ## Checking a row without all numbers filled
 
-I currently represent the default board values as -1 values which I render as dark gray on the frontend. I also allow users to submit checks even if they did not fill out all the number values. If someone submits a row without all the numbers inputted and then refresh, the -1 values get saved into the database, and get parsed incorrectly on the frontend when the data loads in.
-
-
+Another edge case I ran into was submitting a sow with not all number slots filled in. I initially represented the default board values as -1 values which I render as dark gray on the frontend. So if someone submits a row without all the numbers inputted and then refresh, the -1 values get saved into the database, and would get parsed incorrectly on the frontend when the data loads in. My solution was to change the -1 to an 8 (since the only numbers allowed are 0-7) right before it gets saved to the database. I explained this further in the comments here.
 
 https://user-images.githubusercontent.com/45411265/210691117-9338ba22-37b0-4340-8663-d17a42ffcf6c.mov
 
-
-
 # Reflections
 
-## Known bugs / desired improvmenets
+## Desired improvmenets
 
 - When I was working on setting up my development environment, I time boxed it, and decided to just made a production database and production API. I was running into errors when trying to run my local API, so I decided to just punt on that issue. I think ideally, I maybe would have even looked into setting up my developmenet environement with Docker.
 - Adding back players table... then you can load all the games by player ID
+- better UI error handeling
 
 ## Things I learned
 
 Overall this was a really fun and challenging project to work on! Here are some of the things I learned
 
 - Web sockets are a great way to allow realtime communication and not as difficult to implement as I thought. But they do not work on Vercel
+- I learned that getServerSideProps are useufl but can increase inital load time
+- Long polling or websockets are better than short polling
+- Vercel doesn't allow websockets
 - Implementing complex game logic is immensly easier with test driven development! I was running into issues initially when impelenting the algothm to figure out the feedback based on guesses, and creating test cases made the process much more smooth.
 - Using `private` and `readonly` when making classes helps ensure what can be accessed
