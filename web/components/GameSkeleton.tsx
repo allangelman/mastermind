@@ -1,8 +1,9 @@
 import { useRouter } from "next/router";
 import { FeedbackSquare } from "./FeedbackSquare";
-import { Options } from "./Options";
 import { Header } from "./Header";
 import { OptionsModel } from "../models/OptionsModel";
+import cn from "classnames";
+import { OptionsSkeleton } from "./OptionsSkeleton";
 
 interface GameSkeletonProps {
   options: OptionsModel;
@@ -13,37 +14,39 @@ export const GameSkeleton = ({ options }: GameSkeletonProps) => {
   const query = router.query;
 
   return (
-    <div className="flex flex-col justify-center">
-      <Header isMultiplayer={!!query.multiplayer} />
-      <div className="flex justify-center invisible">xxxx</div>
-      <div className="flex justify-center">
-        <div className="h-10 w-14 flex animate-pulse bg-blue-400 rounded-lg px-2"></div>
-      </div>
-      {query.multiplayer && (
-        <div className="flex flex-row space-x-2 items-center justify-center">
-          <div className="w-[400px] h-5 rounded-lg bg-slate-400 animate-pulse" />
-          <button className="h-10 rounded bg-green-300 px-2 hover:bg-green-500">
-            {"Copy and share!"}
-          </button>
+    <div className="flex flex-col">
+      <div className="mx-auto">
+        <div className="w-[500px] mx-auto ">
+          <Header isMultiplayer={!!query.multiplayer} />
         </div>
-      )}
-      <div className="mx-auto w-[800px] justify-center flex flex-row space-x-4">
-        <div className="flex flex-col items-center space-y-2">
-          {query.multiplayer ? (
-            <div className="w-10 h-[25px] bg-slate-400 rounded-lg animate-pulse"></div>
-          ) : (
-            <div />
-          )}
-          <div className="flex flex-col space-y-2">
-            <>
-              {" "}
-              {[0, 0, 0, 0, 0, 0, 0, 0, 0, 0].map((_, i) => (
-                <SkeletonRow key={i} />
-              ))}
-            </>
+      </div>
+      <div className="flex flex-col mx-auto border-2 rounded-lg border-blue-500 ">
+        <div className="flex flex-row items-center  min-h-[120px] mx-auto p-4  space-x-2">
+          <>
+            <OptionsSkeleton />
+            <button className="h-10 w-14 flex justify-center items-center bg-blue-400 hover:bg-blue-600 animate-pulse rounded-lg px-2"></button>
+            {query.multiplayer && (
+              <div className="flex flex-row space-x-2 mx-auto items-center justify-center">
+                <button
+                  className={cn("h-10 w-[170px] rounded-lg bg-green-300 px-2")}
+                ></button>
+              </div>
+            )}
+          </>
+        </div>
+        <div className="mx-auto justify-center border-t-2 min-w-[460px] border-blue-500 flex flex-row">
+          <div className="flex flex-col p-4 items-center space-y-2">
+            {query.multiplayer && (
+              <div className="w-10 h-[25px] bg-slate-500 rounded-lg"></div>
+            )}
+            <div className="w-[300px] flex flex-col space-y-2">
+              <>
+                {[0, 0, 0, 0, 0, 0, 0, 0, 0, 0].map((_rowModel, _i) => (
+                  <SkeletonRow />
+                ))}
+              </>
+            </div>
           </div>
-
-          <Options options={options} />
         </div>
       </div>
     </div>
@@ -64,12 +67,20 @@ export const SkeletonRow = () => {
   );
 };
 
-interface SkeletonSlotProps {}
-
-export const SkeletonSlot = ({}: SkeletonSlotProps) => {
+export const SkeletonSlot = () => {
   return (
     <>
       <div className="w-10 h-10 animate-pulse flex justify-center items-center rounded-full bg-slate-500 border-2 border-black"></div>
     </>
+  );
+};
+
+export const GameEndedSkeleton = () => {
+  return (
+    <div className="flex flex-col items-center">
+      <div className="w-10 h-[5px] bg-slate-500"></div>
+      <div className="w-10 h-[5px] bg-slate-500"></div>
+      <button className="w-40 h-10 flex justify-center items-center bg-green-200 hover:bg-green-300 rounded-lg"></button>
+    </div>
   );
 };

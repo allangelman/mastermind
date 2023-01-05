@@ -1,5 +1,4 @@
 import { OptionsModel } from "../models/OptionsModel";
-import { Rules } from "./Rules";
 
 interface OptionsProps {
   options: OptionsModel;
@@ -21,7 +20,7 @@ interface RowProps {
   options: OptionsModel;
 }
 
-export const Row = ({ values, options }: RowProps) => {
+const Row = ({ values, options }: RowProps) => {
   return (
     <div className="flex flex-row space-x-2 justify-center">
       {values.map((number, i) => (
@@ -40,7 +39,7 @@ interface SlotProps {
   onClick: () => {};
 }
 
-export const Slot = ({ value, onClick }: SlotProps) => {
+const Slot = ({ value, onClick }: SlotProps) => {
   return (
     <div
       onClick={onClick}

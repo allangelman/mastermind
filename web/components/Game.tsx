@@ -10,7 +10,6 @@ import useClipboard from "react-use-clipboard";
 import { Rules } from "./Rules";
 import { Header } from "./Header";
 import { GameModel } from "../models/GameModel";
-import { StartPageSeperator } from "./StartPageSeperator";
 import cn from "classnames";
 
 interface GameProps {
@@ -85,7 +84,7 @@ export const Game = ({ game }: GameProps) => {
         <div className="w-[500px] mx-auto ">
           <Header isMultiplayer={!!query.multiplayer} />
         </div>
-        <div className="flex justify-center">{board.code}</div>
+        {/* <div className="flex justify-center">{board.code}</div> */}
       </div>
       <div className="flex flex-col mx-auto border-2 rounded-lg border-blue-500 ">
         <div className="flex flex-row items-center  min-h-[120px] mx-auto p-4  space-x-2">
@@ -125,7 +124,7 @@ export const Game = ({ game }: GameProps) => {
         </div>
         <div className="mx-auto justify-center border-t-2 min-w-[460px] border-blue-500 flex flex-row">
           <div className="flex flex-col p-4 items-center space-y-2">
-            <div>{board.name}</div>
+            {query.multiplayer && <div>{board.name}</div>}
             <div className="w-[300px] flex flex-col space-y-2">
               <>
                 {board.rows.map((rowModel, i) => (
