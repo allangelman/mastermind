@@ -25,8 +25,8 @@
 
 This is a web application that allows users to play the classic Mastermind game, where you crack a code against the computer, and my version Mastermind Race, where you see who can crack the code fastest among your freinds!
 
-<img width="200
-" alt="Screen Shot 2023-01-04 at 9 28 12 PM" src="https://user-images.githubusercontent.com/45411265/210687813-07aefe52-f30e-43c4-b4dc-7a048effa897.png"> <img width="300
+<img width="350
+" alt="Screen Shot 2023-01-04 at 9 28 12 PM" src="https://user-images.githubusercontent.com/45411265/210687813-07aefe52-f30e-43c4-b4dc-7a048effa897.png"> <img width="400
 " alt="Screen Shot 2023-01-04 at 9 21 57 PM" src="https://user-images.githubusercontent.com/45411265/210687819-abb0a8ff-5bcf-4d51-a7c2-6f656a5612ef.png">
 
 # How to play
