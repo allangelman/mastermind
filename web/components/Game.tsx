@@ -154,9 +154,10 @@ export const Game = ({ game }: GameProps) => {
                 <div className="truncate w-[100px] text-center" key={`id-${i}`}>
                   {competitorBoard.name}
                 </div>
-                <div key={`feedback-${i}`} className="space-y-2 pt-2">
+                <div key={`feedback-${i}`} className="space-y-2 pt-[18px]">
                   {competitorBoard.feedbacks.map((competitorFeedback, i) => (
                     <FeedbackSquare
+                      key={i}
                       feedback={competitorFeedback.values}
                       className="items-center space-y-1 h-10"
                     />

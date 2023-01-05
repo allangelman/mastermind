@@ -45,6 +45,8 @@ To run my code locally, you can clone my repository, cd into the `web` folder , 
 npm run dev
 ```
 
+You may also have to run `npm install` before `npm run dev` depending on what you already have installed on your computer.
+
 To run my test cases for the feedback logic, you can run
 
 ```
@@ -224,7 +226,7 @@ The reasoning I used to create these queries and mutations was thinking about wh
 
 For my database, I choose to use PostgreSQL. Knowing early on I wanted to support the idea of a multiplayer game, I decided the game table would be my "top level" table, and it would have foreign keys to the game_boards table. This would create a one-to-many relationship between the game and game_boards tables. There would also be a one-to-many relationship between the game_boards and game_rows.
 
-Initially I also had a players table, and the game_boards table had a foreign key to the players table. As I continued working on this, as a means to get something working faster, I realized I could "merge" the idea of players with boards by adding a name column to the game_board table. Essentially, a board has a name, and a player is just a board with a name. In [desired improvements](https://github.com/allangelman/mastermind#desired-improvements), I discuss that I would like to bring the players table back as this would allow for more fun extensions!
+Initially I also had a players table, and the game_boards table had a foreign key to the players table. As I continued working on this, as a means to get something working faster, I realized I could "merge" the idea of players with boards by adding a name column to the game_board table. Essentially, a board has a name, and a player is just a board with a name. Since there is a one-to-many relationship between a game and a game_board, and a "player" is just a board with a name, this is how I represented a multiplayer game. In [desired improvements](https://github.com/allangelman/mastermind#desired-improvements), I discuss that I would like to bring the players table back as this would allow for more fun extensions!
 
 ```mermaid
 classDiagram

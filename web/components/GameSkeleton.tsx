@@ -41,8 +41,8 @@ export const GameSkeleton = ({ options }: GameSkeletonProps) => {
             )}
             <div className="w-[300px] flex flex-col space-y-2">
               <>
-                {[0, 0, 0, 0, 0, 0, 0, 0, 0, 0].map((_rowModel, _i) => (
-                  <SkeletonRow />
+                {[0, 0, 0, 0, 0, 0, 0, 0, 0, 0].map((_rowModel, i) => (
+                  <SkeletonRow key={i} />
                 ))}
               </>
             </div>
