@@ -96,7 +96,7 @@ export default function Home({ code }: HomePageProps) {
         <StartPageSeperator />
         <div className="text-2xl">Mastermind Race</div>
         <div>
-          Play Mastermind Race: compete with freinds to see who can crack the
+          Play Mastermind Race: compete with friends to see who can crack the
           code fastest! One person must start the game and then share the "game
           code" with the rest of the players (game code available after game
           started)
